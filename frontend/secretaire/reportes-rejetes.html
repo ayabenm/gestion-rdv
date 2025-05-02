@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rendez-vous Rejetés et Reportés</title>
+  <script src="https://cdn.jsdelivr.net/npm/tailwindcss@3.2.1/dist/tailwind.min.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 font-sans antialiased">
+  <div class="max-w-6xl mx-auto py-12 px-6">
+    <h2 class="text-3xl font-semibold text-gray-800 mb-8 text-center">📝 Liste des Rendez-vous</h2>
+
+    <!-- Liste des Rendez-vous -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+      
+      <!-- Rendez-vous Rejetés -->
+      <div class="bg-white p-6 rounded-xl shadow-xl">
+        <h3 class="text-2xl font-semibold text-red-500 mb-6">🚫 Rendez-vous Rejetés</h3>
+        <div class="space-y-4">
+          <div class="flex justify-between items-center p-4 bg-gray-50 rounded-lg shadow-sm">
+            <div>
+              <p class="font-semibold text-gray-800">Nom : Ahmed Ben Ali</p>
+              <p class="text-gray-600">Date Demandée : 2025-05-01</p>
+              <p class="text-gray-600">Service : Renouvellement CIN</p>
+            </div>
+            <span class="bg-red-500 text-white px-4 py-2 rounded-full">Rejeté</span>
+          </div>
+
+          <div class="flex justify-between items-center p-4 bg-gray-50 rounded-lg shadow-sm">
+            <div>
+              <p class="font-semibold text-gray-800">Nom : Leila Mohamed</p>
+              <p class="text-gray-600">Date Demandée : 2025-05-02</p>
+              <p class="text-gray-600">Service : Passeport</p>
+            </div>
+            <span class="bg-red-500 text-white px-4 py-2 rounded-full">Rejeté</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Rendez-vous Reportés -->
+      <div class="bg-white p-6 rounded-xl shadow-xl">
+        <h3 class="text-2xl font-semibold text-yellow-500 mb-6">⏳ Rendez-vous Reportés</h3>
+        <div class="space-y-4">
+          <div class="flex justify-between items-center p-4 bg-gray-50 rounded-lg shadow-sm">
+            <div>
+              <p class="font-semibold text-gray-800">Nom : Ali Jaziri</p>
+              <p class="text-gray-600">Date Demandée : 2025-05-03</p>
+              <p class="text-gray-600">Service : Carte d'identité</p>
+            </div>
+            <span class="bg-yellow-500 text-white px-4 py-2 rounded-full">Reporté</span>
+          </div>
+
+          <div class="flex justify-between items-center p-4 bg-gray-50 rounded-lg shadow-sm">
+            <div>
+              <p class="font-semibold text-gray-800">Nom : Samira Khlifi</p>
+              <p class="text-gray-600">Date Demandée : 2025-05-04</p>
+              <p class="text-gray-600">Service : Permis de conduire</p>
+            </div>
+            <span class="bg-yellow-500 text-white px-4 py-2 rounded-full">Reporté</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

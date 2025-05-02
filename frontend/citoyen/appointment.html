@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Prendre un rendez-vous - Citoyen</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+
+  <style>
+    @keyframes fadeInUp {
+      0% {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+
+      100% {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .fadeInUp {
+      animation: fadeInUp 0.5s ease-out;
+    }
+
+    /* Nouveau style de carte moderne */
+    .card {
+      background: #ffffff;
+      /* Fond blanc pour la carte */
+      border-radius: 16px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+      /* Ombre douce et subtile */
+      padding: 24px;
+      margin-bottom: 20px;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      border-left: 4px solid #4c51bf;
+      /* Bordure colorée à gauche pour moderniser */
+    }
+
+    .card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+      /* Ombre plus forte au survol */
+    }
+
+    /* Sidebar transition */
+    #sidebar {
+      transition: all 0.3s ease;
+      position: fixed;
+      height: 100vh;
+      z-index: 20;
+    }
+
+    #mainContent {
+      transition: margin-left 0.3s ease;
+      margin-left: 4rem;
+      /* espace initial de 4rem pour le sidebar */
+      width: 100%;
+    }
+
+    /* Transition pour le main lorsque le sidebar est ouvert/fermé */
+    #mainContent {
+      transition: margin-left 0.3s ease;
+    }
+    .glass {
+      background: white;
+      border: 1px solid #e5e7eb;
+      /* border-gray-200 */
+    }
+
+    .glow-button {
+      position: relative;
+      overflow: hidden;
+    }
+
+    .glow-button::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: linear-gradient(45deg, #3b82f6, #06b6d4, #10b981, #3b82f6);
+      animation: rotate 6s linear infinite;
+      z-index: 0;
+    }
+
+    .glow-button span {
+      position: relative;
+      z-index: 1;
+    }
+
+    @keyframes rotate {
+      0% {
+        transform: rotate(0deg);
+      }
+
+      100% {
+        transform: rotate(360deg);
+      }
+    }
+  </style>
+</head>
+
+<body class="bg-white font-sans text-gray-900">
+
+  <!-- Sidebar -->
+  <div id="sidebar"
+    class="bg-gradient-to-r from-gray-900 to-gray-800 text-white h-screen w-20 transition-all duration-300 flex flex-col shadow-lg">
+    <!-- Top -->
+    <div class="flex items-center justify-center p-6 border-b border-gray-700 flex-shrink-0">
+      <li onclick="toggleSidebar()"
+        class="px-6 py-4 flex items-center justify-center gap-4 hover:bg-orange-600 cursor-pointer transition duration-200 rounded-lg">
+        <i class="fas fa-bars"></i>
+      </li>
+    </div>
+    <!-- Menu -->
+    <ul class="flex-1 mt-6 space-y-4">
+      <li class="px-6 py-4 flex items-center gap-4 hover:bg-orange-600 hover:shadow-md transition duration-200 rounded-lg">
+        <i class="fas fa-home w-6 text-center"></i>
+        <span class="sidebar-text hidden"><a href="dashboard.html"
+            class="block hover:text-gray-300">Dashboard</a></span>
+      </li>
+      <li
+        class="px-6 py-4 flex items-center gap-4 bg-orange-600 text-white rounded-lg">
+        <i class="fas fa-calendar-plus w-6 text-center"></i>
+        <span class="sidebar-text hidden"><a href="appointment.html"
+            class="block hover:text-gray-300">Rendez-vous</a></span>
+      </li>
+      <li
+        class="px-6 py-4 flex items-center gap-4 hover:bg-orange-600 hover:shadow-md transition duration-200 rounded-lg">
+        <i class="fas fa-history w-6 text-center"></i>
+        <span class="sidebar-text hidden"><a href="history.html" class="block hover:text-gray-300">Historique</a></span>
+      </li>
+      <li
+        class="px-6 py-4 flex items-center gap-4 hover:bg-orange-600 hover:shadow-md transition duration-200 rounded-lg">
+        <i class="fas fa-id-card w-6 text-center"></i>
+        <span class="sidebar-text hidden"><a href="profile.html" class="block hover:text-gray-300">Profil</a></span>
+      </li>
+    </ul>
+
+    <!-- Footer -->
+    <div class="p-4 border-t border-gray-700">
+      <button onclick="logout()"
+        class="bg-red-600 hover:bg-red-700 w-full py-3 rounded-lg flex items-center justify-center gap-2">
+        <i class="fas fa-sign-out-alt"></i>
+        <span class="sidebar-text hidden">Déconnexion</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div id="mainContent" class="flex-1 p-8 transition-all duration-300">
+    <header class="bg-orange-600 text-white py-6 px-8 shadow-lg rounded-lg flex items-center justify-between">
+      <h1 class="text-3xl font-bold">⏰ Rendez-vous</h1>
+    </header>
+
+<!-- Contenu principal -->
+<div class="flex items-center justify-center px-4 py-6 text-gray-800">
+  <div class="glass rounded-3xl shadow-xl w-full max-w-4xl p-8 space-y-6">
+    <h2 class="text-3xl font-bold text-center mb-4">🗓️ Réserver un Rendez-vous</h2>
+
+    <form id="rdvForm" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <!-- Établissement -->
+      <div>
+        <label class="block text-sm font-medium mb-1">🏢 Établissement</label>
+        <select name="etablissement" required
+          class="w-full p-3 rounded-lg bg-gray-100 text-gray-800 focus:ring-2 focus:ring-blue-500">
+          <option disabled selected>Choisir...</option>
+        </select>
+      </div>
+
+      <!-- Département -->
+      <div>
+        <label class="block text-sm font-medium mb-1">🏬 Département</label>
+        <select name="departement" required
+          class="w-full p-3 rounded-lg bg-gray-100 text-gray-800 focus:ring-2 focus:ring-blue-500">
+          <option disabled selected>Choisir...</option>
+        </select>
+      </div>
+
+      <!-- Service -->
+      <div>
+        <label class="block text-sm font-medium mb-1">🔧 Service</label>
+        <select name="service" required
+          class="w-full p-3 rounded-lg bg-gray-100 text-gray-800 focus:ring-2 focus:ring-blue-500">
+          <option disabled selected>Choisir...</option>
+        </select>
+      </div>
+
+      <!-- Date souhaitée -->
+      <div>
+        <label class="block text-sm font-medium mb-1">📅 Date souhaitée</label>
+        <input type="date" name="date_rdv" required
+          class="w-full p-3 rounded-lg bg-gray-100 text-gray-800 focus:ring-2 focus:ring-blue-500" />
+      </div>
+      <!-- Date preferer -->
+      <div>
+        <label class="block text-sm font-medium mb-1">📅 Date préférée</label>
+        <input type="date" name="preferred_date" required
+          class="w-full p-3 rounded-lg bg-gray-100 text-gray-800 focus:ring-2 focus:ring-teal-500" />
+      </div>
+      
+      <!-- Deadline -->
+      <div>
+        <label class="block text-sm font-medium mb-1">⏳ Date limite</label>
+        <input type="date" name="deadline" required
+          class="w-full p-3 rounded-lg bg-gray-100 text-gray-800 focus:ring-2 focus:ring-teal-500" />
+      </div>
+
+      <!-- Point de contact -->
+      <div class="md:col-span-2">
+        <label class="block text-sm font-medium mb-1">📞 Point de contact</label>
+        <input type="text" name="point_contact" placeholder="Téléphone ou Email" required
+          class="w-full p-3 rounded-lg bg-gray-100 text-gray-800 focus:ring-2 focus:ring-pink-500" />
+      </div>
+    </form>
+
+    <!-- Submit Button -->
+    <div class="text-center">
+      <button type="submit" form="rdvForm"
+        class="px-10 py-3 rounded-full text-white font-semibold shadow-xl bg-orange-600 border-2 border-black hover:bg-black hover:border-orange-600 transition-all duration-300">
+        <span>📨 Envoyer la demande</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+</body>
+<script>
+  // Vérification du token JWT
+  const token = localStorage.getItem('token');
+  const loginURL = '/rdv/frontend/login.html';
+  if (!token) {
+    window.location.href = loginURL;  // Rediriger vers la page de connexion
+  }
+
+  // Fonction de déconnexion
+  function logout() {
+    localStorage.removeItem('token');
+    window.location.href = loginURL;
+  }
+  // Fonction pour basculer l'état du sidebar
+  function toggleSidebar() {
+    const sidebar = document.getElementById("sidebar");
+    const textElements = sidebar.querySelectorAll(".sidebar-text");
+    const mainContent = document.getElementById("mainContent");
+
+    // Vérifier si le sidebar est ouvert ou fermé
+    if (sidebar.classList.contains("w-20")) {
+      // Ouvrir le sidebar (afficher les icônes et les textes)
+      sidebar.classList.remove("w-20");
+      sidebar.classList.add("w-64");
+      textElements.forEach(el => el.classList.remove("hidden"));  // Afficher les textes
+      mainContent.style.marginLeft = "1cm";  // Espace réduit à 1 cm
+    } else {
+      // Fermer le sidebar (afficher uniquement les icônes)
+      sidebar.classList.remove("w-64");
+      sidebar.classList.add("w-20");
+      textElements.forEach(el => el.classList.add("hidden"));  // Cacher les textes
+      mainContent.style.marginLeft = "1cm";  // Espace réduit à 1 cm
+    }
+  }
+</script>
+<script>
+  const API_BASE_URL = "http://localhost:3000/api/";
+  document.addEventListener('DOMContentLoaded', async () => {
+    const etablissementSelect = document.querySelector('[name="etablissement"]');
+    const departementSelect = document.querySelector('[name="departement"]');
+    const serviceSelect = document.querySelector('[name="service"]');
+
+    // Charger les établissements
+    const loadEtablissements = async () => {
+      const res = await fetch(API_BASE_URL + 'citoyen/establishments', {
+        method: 'GET',
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": token
+        }
+      });
+      const etablissements = await res.json();
+      etablissementSelect.innerHTML = '<option disabled selected>Choisir...</option>';
+      etablissements.forEach(e => {
+        const opt = document.createElement('option');
+        opt.value = e.id;
+        opt.textContent = e.name;
+        etablissementSelect.appendChild(opt);
+      });
+    };
+
+    // Charger les départements
+    etablissementSelect.addEventListener('change', async () => {
+      const id = etablissementSelect.value;
+      if (id) {
+        const res = await fetch(API_BASE_URL + `departements/establishment/${id}`, {
+          method: 'GET',
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": token
+          }
+        });
+        const departements = await res.json();
+        departementSelect.innerHTML = '<option disabled selected>Choisir...</option>';
+        serviceSelect.innerHTML = '<option disabled selected>Choisir...</option>'; // reset service
+        departements.forEach(d => {
+          const opt = document.createElement('option');
+          opt.value = d.id;
+          opt.textContent = d.name;
+          departementSelect.appendChild(opt);
+        });
+      }
+    });
+
+    // Charger les services
+    departementSelect.addEventListener('change', async () => {
+      const id = departementSelect.value;
+      if (id) {
+        const res = await fetch(API_BASE_URL + `services/${id}`, {
+          method: 'GET',
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": token
+          }
+        });
+        const services = await res.json();
+        serviceSelect.innerHTML = '<option disabled selected>Choisir...</option>';
+        services.forEach(service => {
+          const opt = document.createElement('option');
+          opt.value = service.id;
+          opt.textContent = service.name;
+          serviceSelect.appendChild(opt);
+        });
+      }
+    });
+
+    // Initialiser les données
+    loadEtablissements();
+
+    var now = new Date(),
+      // minimum date the user can choose, in this case now and in the future
+      minDate = now.toISOString().slice(0, new Date().toISOString().lastIndexOf(":"));
+
+    document.querySelector('[name="date_rdv"]').setAttribute('min', minDate);
+    document.querySelector('[name="preferred_date"]').setAttribute('min', minDate);
+    document.querySelector('[name="deadline"]').setAttribute('min', minDate);
+  });
+
+  // Soumission du formulaire
+  document.getElementById('rdvForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const form = e.target;
+    const data = Object.fromEntries(new FormData(form));
+    const payload = {
+      establishment_id: data.etablissement,
+      departement_id: data.departement,
+      service_id: data.service,
+      date_rdv: data.date_rdv,
+      preferred_date :data.preferred_date,
+      deadline: data.deadline,
+      point_contact: data.point_contact
+    };
+
+    const res = await fetch(API_BASE_URL + 'appointments', {
+      method: 'POST',
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": token
+      },
+      body: JSON.stringify(payload)
+    });
+
+    const result = await res.json();
+    alert(result.message);
+    window.location.href = "history.html"
+  });
+</script>
+</html>

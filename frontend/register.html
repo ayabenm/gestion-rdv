@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Inscription</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    html, body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+    }
+  </style>
+</head>
+
+<body class="bg-orange-100 flex items-center justify-center min-h-screen">
+
+  <div class="flex flex-col md:flex-row bg-white shadow-2xl rounded-2xl overflow-hidden w-full max-w-5xl min-h-screen md:min-h-[600px]">
+
+    <!-- Image à gauche -->
+    <div class="w-full md:w-1/2 h-64 md:h-auto">
+      <img src="./login.jpg" alt="Image d'inscription"
+        class="h-full w-full object-cover" />
+    </div>
+
+    <!-- Formulaire à droite -->
+    <div class="w-full md:w-1/2 p-8 flex flex-col justify-center">
+      <h2 class="text-3xl font-bold text-center text-orange-600 mb-4">Créer un compte</h2>
+      <p class="text-center text-gray-600 mb-6">Remplissez les informations pour vous inscrire</p>
+
+      <form id="registerForm" class="space-y-4 px-2 md:px-4">
+        <div class="flex gap-4">
+          <input type="text" name="name" placeholder="Nom" class="w-1/2 px-4 py-2 border border-gray-300 rounded-lg" required>
+          <input type="text" name="first_name" placeholder="Prénom" class="w-1/2 px-4 py-2 border border-gray-300 rounded-lg" required>
+        </div>
+
+        <input type="email" name="email" placeholder="Email" class="w-full px-4 py-2 border border-gray-300 rounded-lg" required>
+        <input type="password" name="password" placeholder="Mot de passe" class="w-full px-4 py-2 border border-gray-300 rounded-lg"
+          required autocomplete="new-password">
+        <input type="text" name="phone" placeholder="Téléphone (8 chiffres)" class="w-full px-4 py-2 border border-gray-300 rounded-lg" required>
+        <input type="text" name="cin" placeholder="CIN" class="w-full px-4 py-2 border border-gray-300 rounded-lg" required>
+
+        <select name="role" class="w-full px-4 py-2 border border-gray-300 rounded-lg" required>
+          <option value="">-- Sélectionnez un rôle --</option>
+          <option value="citoyen">Citoyen</option>
+          <option value="secretaire">Secrétaire</option>
+          <option value="admin">Administrateur</option>
+        </select>
+
+        <input type="number" name="establishment_id" placeholder="ID établissement (optionnel)"
+          class="w-full px-4 py-2 border border-gray-300 rounded-lg">
+
+        <button type="submit"
+          class="w-full bg-black text-white py-2 rounded-lg hover:bg-orange-700 transition">
+          S'inscrire
+        </button>
+      </form>
+
+      <p class="mt-4 text-sm text-center text-gray-600">
+        Vous avez déjà un compte ?
+        <a href="login.html" class="text-orange-500 hover:underline">Se connecter</a>
+      </p>
+    </div>
+  </div>
+
+  <script>
+    const form = document.getElementById('registerForm');
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const data = {
+        firstname: form.name.value,
+        lastname: form.first_name.value,
+        email: form.email.value,
+        password: form.password.value,
+        phone: form.phone.value,
+        cin: form.cin.value,
+        role: form.role.value,
+        establishment_id: form.establishment_id.value || null
+      };
+
+      try {
+        const res = await fetch('http://localhost:3000/api/auth/register', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(data)
+        });
+
+        const result = await res.json();
+
+        if (res.ok) {
+          alert("Inscription réussie !");
+          window.location.href = 'login.html';
+        } else {
+          alert("Erreur : " + result.message);
+        }
+      } catch (err) {
+        alert("Erreur de connexion au serveur");
+        console.error(err);
+      }
+    });
+  </script>
+</body>
+
+</html>

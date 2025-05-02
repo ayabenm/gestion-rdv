@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Notifications de Rendez-vous</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gray-100 min-h-screen flex flex-col items-center py-10">
+
+  <h1 class="text-3xl font-bold mb-8 text-gray-800">Mes Notifications</h1>
+
+  <div class="w-full max-w-3xl bg-white rounded-2xl shadow-xl p-6 space-y-6">
+
+    <!-- Notification 1 -->
+    <div class="flex items-start space-x-4 p-4 bg-gray-50 rounded-xl hover:shadow-md transition">
+      <div class="bg-blue-100 p-3 rounded-full">
+        <svg class="w-6 h-6 text-blue-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M16 12H8m0 0l4-4m-4 4l4 4" />
+        </svg>
+      </div>
+      <div class="flex-1">
+        <p class="text-gray-800 font-semibold">Confirmation par Email</p>
+        <p class="text-gray-600 text-sm mt-1">Votre rendez-vous est fixé le 5 mai 2025 à 10h30 au Ministère des Finances.</p>
+        <p class="text-gray-400 text-xs mt-2">Reçu le 28 avril 2025 à 14h12</p>
+      </div>
+    </div>
+
+    <!-- Notification 2 -->
+    <div class="flex items-start space-x-4 p-4 bg-gray-50 rounded-xl hover:shadow-md transition">
+      <div class="bg-green-100 p-3 rounded-full">
+        <svg class="w-6 h-6 text-green-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8m-18 0v8a2 2 0 002 2h14a2 2 0 002-2V8" />
+        </svg>
+      </div>
+      <div class="flex-1">
+        <p class="text-gray-800 font-semibold">Confirmation par SMS</p>
+        <p class="text-gray-600 text-sm mt-1">Rendez-vous confirmé : 5 mai 2025 à 10h30. Merci de votre ponctualité.</p>
+        <p class="text-gray-400 text-xs mt-2">Reçu le 28 avril 2025 à 14h13</p>
+      </div>
+    </div>
+
+    <!-- Si pas de notifications -->
+    <!-- <p class="text-center text-gray-400">Aucune notification reçue pour l'instant.</p> -->
+
+  </div>
+
+</body>
+</html>

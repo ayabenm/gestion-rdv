@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Gestion des Départements</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+  <style>
+    /* Transition pour le main lorsque le sidebar est ouvert/fermé */
+    #mainContent {
+      transition: margin-left 0.3s ease;
+    }
+  </style>
+</head>
+
+<body class="bg-gray-100 text-gray-800 font-sans flex">
+
+  <!-- Sidebar -->
+  <div id="sidebar"
+    class="bg-gradient-to-r from-gray-900 to-gray-800 text-white h-screen w-20 transition-all duration-300 flex flex-col shadow-lg">
+    <!-- Top -->
+    <div class="flex items-center justify-center p-6 border-b border-gray-700 flex-shrink-0">
+      <li onclick="toggleSidebar()"
+        class="px-6 py-4 flex items-center justify-center gap-4 hover:bg-orange-600 cursor-pointer transition duration-200 rounded-lg">
+        <i class="fas fa-bars"></i>
+      </li>
+    </div>
+    <!-- Menu -->
+    <ul class="flex-1 mt-6 space-y-4">
+      <li
+        class="px-6 py-4 flex items-center gap-4 hover:bg-orange-600 hover:shadow-md transition duration-200 rounded-lg">
+        <i class="fas fa-home w-6 text-center"></i>
+        <span class="sidebar-text hidden"><a href="dashboard.html" class="block hover:text-gray-300">Tableau de
+            bord</a></span>
+      <li class="px-6 py-4 flex items-center gap-4 bg-orange-600 text-white rounded-lg">
+        <i class="fas fa-school w-6 text-center"></i>
+        <span class="sidebar-text hidden"><a href="departement.html"
+            class="block hover:text-gray-300">Département</a></span>
+      </li>
+      <li
+        class="px-6 py-4 flex items-center gap-4 hover:bg-orange-600 hover:shadow-md transition duration-200 rounded-lg">
+        <i class="fas fa-building w-6 text-center"></i>
+        <span class="sidebar-text hidden"><a href="service.html" class="block hover:text-gray-300">Services</a></span>
+      </li>
+      <li
+        class="px-6 py-4 flex items-center gap-4 hover:bg-orange-600 hover:shadow-md transition duration-200 rounded-lg">
+        <i class="fas fa-chart-bar w-6 text-center"></i>
+        <span class="sidebar-text hidden"><a href="statistiques.html"
+            class="block hover:text-gray-300">Statistiques</a></span>
+      </li>
+    </ul>
+
+    <!-- Footer -->
+    <div class="p-4 border-t border-gray-700">
+      <button onclick="logout()"
+        class="bg-red-600 hover:bg-red-700 w-full py-3 rounded-lg flex items-center justify-center gap-2">
+        <i class="fas fa-sign-out-alt"></i>
+        <span class="sidebar-text hidden">Déconnexion</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div id="mainContent" class="flex-1 p-8 transition-all duration-300">
+    <header class="bg-orange-600 text-white py-6 px-8 shadow-lg rounded-lg flex items-center justify-between">
+      <h1 class="text-3xl font-bold">Gestion des Départements</h1>
+    </header>
+
+    <main class="mt-8">
+      <div class="max-w-7xl mx-auto">
+        <button onclick="openAddModal()"
+          class="mb-8 px-6 py-3 bg-orange-600 hover:bg-orange-700 text-white rounded-md shadow-md transition">
+          <i class="fas fa-plus mr-2"></i>Ajouter un département
+        </button>
+
+        <h3 class="text-xl font-semibold text-orange-600 mb-4">Liste des départements</h3>
+        <div class="overflow-x-auto bg-white shadow-lg rounded-lg">
+          <table class="min-w-full table-auto">
+            <thead class="bg-gray-100 text-gray-600 uppercase text-sm">
+              <tr>
+                <th class="px-6 py-3 text-center">Nom</th>
+                <th class="px-6 py-3 text-center">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="departementTable" class="text-gray-700 divide-y">
+              <!-- Données dynamiques ici -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Modal Ajouter -->
+  <div id="addModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 hidden">
+    <div class="bg-white w-full max-w-md rounded-lg shadow-lg p-6">
+      <h3 class="text-xl font-semibold mb-4">Ajouter un Département</h3>
+      <input type="text" id="addDepartementNom" class="w-full border px-4 py-2 rounded mb-4"
+        placeholder="Nom du département">
+      <div class="flex justify-end gap-3">
+        <button onclick="addDepartement()"
+          class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">Ajouter</button>
+        <button onclick="closeAddModal()" class="bg-gray-300 px-4 py-2 rounded-lg hover:bg-gray-400">Annuler</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Modifier -->
+  <div id="modal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 hidden">
+    <div class="bg-white w-full max-w-md rounded-lg shadow-lg p-6">
+      <h3 class="text-xl font-semibold mb-4">Modifier le Département</h3>
+      <input type="hidden" id="editDepartementId">
+      <input type="text" id="editDepartementNom" class="w-full border px-4 py-2 rounded mb-4"
+        placeholder="Nom du département">
+      <div class="flex justify-end gap-3">
+        <button onclick="updateDepartement()"
+          class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">Enregistrer</button>
+        <button onclick="closeModal()" class="bg-gray-300 px-4 py-2 rounded-lg hover:bg-gray-400">Annuler</button>
+      </div>
+    </div>
+  </div>
+  <script>
+    // Vérification du token JWT
+    const token = localStorage.getItem('token');
+    const loginURL = '/rdv/frontend/login.html';
+    if (!token) {
+      window.location.href = loginURL;  // Rediriger vers la page de connexion
+    }
+
+    // Fonction de déconnexion
+    function logout() {
+      localStorage.removeItem('token');
+      window.location.href = loginURL;
+    }
+
+    // Fonction pour basculer l'état du sidebar
+    function toggleSidebar() {
+      const sidebar = document.getElementById("sidebar");
+      const textElements = sidebar.querySelectorAll(".sidebar-text");
+      const mainContent = document.getElementById("mainContent");
+
+      if (sidebar.classList.contains("w-20")) {
+        sidebar.classList.remove("w-20");
+        sidebar.classList.add("w-64");
+        textElements.forEach(el => el.classList.remove("hidden"));
+        mainContent.style.marginLeft = "16rem"; /* augmenté à 16rem lorsque sidebar est ouvert */
+      } else {
+        sidebar.classList.remove("w-64");
+        sidebar.classList.add("w-20");
+        textElements.forEach(el => el.classList.add("hidden"));
+        mainContent.style.marginLeft = "4rem"; /* espace initial de 4rem */
+      }
+    }
+  </script>
+  <script>
+    const apiUrl = "http://localhost:3000/api";
+    function fetchDepartements() {
+      fetch(`${apiUrl}/departements`, {
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': token
+        }
+      })
+        .then(response => response.json())
+        .then(data => {
+          const departementTable = document.getElementById("departementTable");
+          departementTable.innerHTML = ""; // Réinitialiser le tableau
+
+          data.forEach(departement => {
+            const row = document.createElement("tr");
+
+            row.innerHTML = `
+          <td class="px-6 py-3 text-center">${departement.name}</td>
+          <td class="px-6 py-3 text-center">
+            <button onclick="openEditModal(${departement.id}, '${departement.name}')" class="text-blue-600 hover:text-blue-800">Modifier</button>
+            <button onclick="deleteDepartement(${departement.id})" class="text-red-600 hover:text-red-800 ml-3">Supprimer</button>
+          </td>
+        `;
+            departementTable.appendChild(row);
+          });
+        });
+    }
+    function openAddModal() {
+      document.getElementById("addModal").classList.remove("hidden");
+    }
+    function closeAddModal() {
+      document.getElementById("addModal").classList.add("hidden");
+    }
+    function addDepartement() {
+      const name = document.getElementById("addDepartementNom").value;
+
+      if (name) {
+        fetch(`${apiUrl}/departements`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": token
+          },
+          body: JSON.stringify({ name }),
+        })
+          .then(response => response.json())
+          .then(() => {
+            fetchDepartements();
+            closeAddModal();
+          });
+      }
+    }
+    function openEditModal(id, name) {
+      document.getElementById("editDepartementId").value = id;
+      document.getElementById("editDepartementNom").value = name;
+      document.getElementById("modal").classList.remove("hidden");
+    }
+    function closeModal() {
+      document.getElementById("modal").classList.add("hidden");
+    }
+    function updateDepartement() {
+      const id = document.getElementById("editDepartementId").value;
+      const name = document.getElementById("editDepartementNom").value;
+
+      fetch(`${apiUrl}/departements/${id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": token
+        },
+        body: JSON.stringify({ name }),
+      })
+        .then(response => response.json())
+        .then(() => {
+          fetchDepartements();
+          closeModal();
+        });
+    }
+    function deleteDepartement(id) {
+      if (confirm("Êtes-vous sûr de vouloir supprimer ce département ?")) {
+        fetch(`${apiUrl}/departements/${id}`, {
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": token
+          },
+          method: "DELETE",
+        })
+          .then(response => response.json())
+          .then(() => {
+            fetchDepartements();
+          });
+      }
+    }
+    document.addEventListener("DOMContentLoaded", () => {
+      fetchDepartements();
+    });
+  </script>
+</body>
+
+</html>

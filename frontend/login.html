@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Connexion</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    html, body {
+      height: 100%;
+    }
+  </style>
+</head>
+
+<body class="bg-orange-100 flex items-center justify-center min-h-screen">
+
+  <div class="flex flex-col md:flex-row bg-white shadow-2xl rounded-2xl overflow-hidden w-full max-w-5xl min-h-screen md:min-h-[600px]">
+
+    <!-- Partie gauche - image -->
+    <div class="w-full md:w-1/2 h-64 md:h-auto">
+      <img src="./login.jpg" alt="Image de connexion"
+        class="h-full w-full object-cover" />
+    </div>
+
+    <!-- Partie droite - formulaire -->
+    <div class="w-full md:w-1/2 p-8 flex flex-col justify-center">
+      <h2 class="text-3xl font-bold text-center text-orange-600 mb-4">Bienvenue 👋</h2>
+      <p class="text-center text-gray-600 mb-6">Connectez-vous à votre compte</p>
+
+      <form id="loginForm" class="space-y-5">
+        <input required type="email" name="email" placeholder="Email"
+          class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500" />
+
+        <input required type="password" name="password" placeholder="Mot de passe" autocomplete="current-password"
+          class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500" />
+
+        <button type="submit"
+          class="w-full bg-black text-white py-2 px-4 rounded-lg hover:bg-orange-700 transition">Connexion</button>
+      </form>
+
+      <div class="text-sm text-center mt-4 text-gray-600">
+        Mot de passe oublié ? <a href="forgot-password.html" class="text-orange-500 hover:underline">Réinitialiser</a>
+      </div>
+
+      <div class="mt-6 flex items-center justify-between">
+        <span class="border-b w-1/5 lg:w-1/4"></span>
+        <span class="text-xs text-gray-500 uppercase">Ou</span>
+        <span class="border-b w-1/5 lg:w-1/4"></span>
+      </div>
+
+      <p class="mt-6 text-center text-sm text-gray-600">
+        Pas encore de compte ? <a href="register.html" class="text-orange-500 hover:underline">Créer un compte</a>
+      </p>
+    </div>
+  </div>
+
+  <script>
+    const form = document.getElementById('loginForm');
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const data = {
+        email: form.email.value,
+        password: form.password.value
+      };
+
+      try {
+        const res = await fetch('http://localhost:3000/api/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data)
+        });
+
+        const result = await res.json();
+
+        if (!res.ok) {
+          alert(result.message);
+          return;
+        }
+
+        localStorage.setItem('token', result.token);
+        window.location.href = result.role + '/dashboard.html';
+      } catch (err) {
+        alert("Erreur lors de la connexion.");
+        console.error(err);
+      }
+    });
+  </script>
+</body>
+
+</html>

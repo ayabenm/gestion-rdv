@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Gestion des Utilisateurs</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet" />
+  <style>
+    /* Modal */
+    .modal {
+      background-color: rgba(0, 0, 0, 0.6);
+      position: fixed;
+      inset: 0;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 50;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .modal.active {
+      display: flex;
+      opacity: 1;
+    }
+
+    /* Animations for Modal */
+    .modal-content {
+      animation: slideFade 0.3s ease-out;
+    }
+
+    @keyframes slideFade {
+      from {
+        opacity: 0;
+        transform: translateY(-20px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .glass-card {
+      background: rgba(255, 255, 255, 0.9);
+      backdrop-filter: blur(12px);
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+      border-radius: 1rem;
+      transition: transform 0.2s ease-in-out;
+    }
+
+    .glass-card:hover {
+      transform: translateY(-5px);
+    }
+
+    .avatar-shadow {
+      box-shadow: 0 4px 20px rgba(99, 102, 241, 0.3);
+    }
+
+    /* Sidebar transition */
+    #sidebar {
+      transition: all 0.3s ease;
+      position: fixed;
+      height: 100vh;
+      z-index: 20;
+    }
+
+    #mainContent {
+      transition: margin-left 0.3s ease;
+      margin-left: 4rem;
+      /* espace initial de 4rem pour le sidebar */
+      width: 100%;
+    }
+  </style>
+</head>
+
+<body class="bg-gradient-to-br from-indigo-50 to-white min-h-screen flex">
+  <div id="sidebar"
+    class="bg-gradient-to-r from-gray-900 to-gray-800 text-white h-screen w-20 transition-all duration-300 flex flex-col shadow-lg">
+    <div class="flex items-center justify-center p-6 border-b border-gray-600 flex-shrink-0">
+      <li onclick="toggleSidebar()"
+        class="px-6 py-4 flex items-center justify-center gap-4 hover:bg-orange-600 cursor-pointer transition duration-200 rounded-lg">
+        <i class="fas fa-bars text-white text-2xl"></i>
+      </li>
+    </div>
+    <!-- Menu -->
+    <ul class="flex-1 mt-6 space-y-4">
+      <li class="px-6 py-4 flex items-center gap-4 bg-orange-600 text-white rounded-lg">
+        <i class="fas fa-home w-6 text-center"></i>
+        <span class="sidebar-text hidden"><a href="dashboard.html" class="block hover:text-gray-300">Tableau de
+            bord</a></span>
+      </li>
+
+      <li
+        class="px-6 py-4 flex items-center gap-4 hover:bg-orange-600 hover:shadow-md transition duration-200 rounded-lg">
+        <i class="fas fa-users w-6 text-center"></i>
+        <span class="sidebar-text hidden"><a href="etablissement.html"
+            class="block hover:text-gray-300">Établissements</a></span>
+      </li>
+      <li
+        class="px-6 py-4 flex items-center gap-4 hover:bg-orange-600 hover:shadow-md transition duration-200 rounded-lg">
+        <i class="fas fa-school w-6 text-center"></i>
+        <span class="sidebar-text hidden"><a href="departement.html"
+            class="block hover:text-gray-300">Département</a></span>
+      </li>
+      <li
+        class="px-6 py-4 flex items-center gap-4 hover:bg-orange-600 hover:shadow-md transition duration-200 rounded-lg">
+        <i class="fas fa-building w-6 text-center"></i>
+        <span class="sidebar-text hidden"><a href="service.html" class="block hover:text-gray-300">Services</a></span>
+      </li>
+      <li
+        class="px-6 py-4 flex items-center gap-4 hover:bg-orange-600 hover:shadow-md transition duration-200 rounded-lg">
+        <i class="fas fa-chart-bar w-6 text-center"></i>
+        <span class="sidebar-text hidden"><a href="statistiques.html"
+            class="block hover:text-gray-300">Statistiques</a></span>
+      </li>
+    </ul>
+
+    <div class="p-4 border-t border-gray-600">
+      <button onclick="logout()"
+        class="bg-red-600 hover:bg-red-700 w-full py-3 rounded-lg flex items-center justify-center gap-2">
+        <i class="fas fa-sign-out-alt"></i>
+        <span class="sidebar-text hidden">Déconnexion</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div id="mainContent" class="flex-1 bg-white p-6">
+    <header class="bg-orange-500 text-white py-5 px-6 flex justify-between items-center shadow-lg">
+      <h1 class="text-2xl font-bold">Gestion des Utilisateurs</h1>
+      <button onclick="toggleForm()"
+        class="bg-white text-orange-500 font-semibold px-4 py-2 rounded-full hover:bg-gray-100 transition duration-200 shadow-md">
+        + Ajouter
+      </button>
+    </header>
+
+    <div class="container mx-auto p-6">
+
+        <!-- Titre principal -->
+        <div class="text-center">
+            <h1 class="text-3xl font-semibold text-gray-800">Tableau de Bord des Statistiques</h1>
+            <p class="mt-2 text-lg text-gray-600">Vue d'ensemble des données du système</p>
+        </div>
+
+        <!-- Statistiques -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
+
+            <!-- Total Utilisateurs -->
+            <div class="bg-white shadow-lg rounded-lg p-6">
+                <h2 class="text-xl font-semibold text-gray-700">Utilisateurs Totals</h2>
+                <p class="mt-2 text-3xl text-blue-600" id="total-users">Chargement...</p>
+            </div>
+
+            <!-- Total Établissements -->
+            <div class="bg-white shadow-lg rounded-lg p-6">
+                <h2 class="text-xl font-semibold text-gray-700">Établissements Totals</h2>
+                <p class="mt-2 text-3xl text-green-600" id="total-establishments">Chargement...</p>
+            </div>
+
+            <!-- Total Départements -->
+            <div class="bg-white shadow-lg rounded-lg p-6">
+                <h2 class="text-xl font-semibold text-gray-700">Départements Totals</h2>
+                <p class="mt-2 text-3xl text-orange-600" id="total-departments">Chargement...</p>
+            </div>
+
+            <!-- Total Rendez-vous -->
+            <div class="bg-white shadow-lg rounded-lg p-6">
+                <h2 class="text-xl font-semibold text-gray-700">Rendez-vous Totals</h2>
+                <p class="mt-2 text-3xl text-purple-600" id="total-appointments">Chargement...</p>
+            </div>
+
+            <!-- Utilisateurs Actifs -->
+            <div class="bg-white shadow-lg rounded-lg p-6">
+                <h2 class="text-xl font-semibold text-gray-700">Utilisateurs Actifs Aujourd'hui</h2>
+                <p class="mt-2 text-3xl text-red-600" id="active-users-today">Chargement...</p>
+            </div>
+
+        </div>
+
+        <!-- Autres sections ou informations ici -->
+
+    </div>
+            <!-- Graphiques Statistiques -->
+            <div class="grid grid-cols-2 gap-6 mb-8">
+                <!-- Graphique 1 -->
+                <div class="bg-white p-6 rounded-lg shadow-md">
+                    <h4 class="font-semibold text-lg">Répartition des Utilisateurs</h4>
+                    <div class="h-40 bg-gray-300 rounded-lg"></div> <!-- Placeholder pour graphique -->
+                </div>
+
+                <!-- Graphique 2 -->
+                <div class="bg-white p-6 rounded-lg shadow-md">
+                    <h4 class="font-semibold text-lg">Rendez-vous par Mois</h4>
+                    <div class="h-40 bg-gray-300 rounded-lg"></div> <!-- Placeholder pour graphique -->
+                </div>
+            </div>
+
+            <!-- Activités Récentes -->
+            <div class="bg-white p-6 rounded-lg shadow-md">
+                <h3 class="text-xl font-semibold mb-4">Activités Récentes</h3>
+                <ul class="space-y-4">
+                    <li class="p-4 bg-gray-50 rounded-lg">
+                        <p><strong>Utilisateur :</strong> Nouveau citoyen inscrit</p>
+                        <p class="text-sm text-gray-500">Il y a 2 heures</p>
+                    </li>
+                    
+                </ul>
+            </div>
+        </div>
+    </div>
+    <script>
+      // Vérification du token JWT
+      const token = localStorage.getItem('token');
+      const loginURL = '/rdv/frontend/login.html';
+      if (!token) {
+        window.location.href = loginURL; // Rediriger vers la page de connexion
+      }
+  
+      // Fonction de déconnexion
+      function logout() {
+        localStorage.removeItem('token');
+        window.location.href = loginURL;
+      }
+  
+      // Fonction pour basculer l'état du sidebar
+      function toggleSidebar() {
+        const sidebar = document.getElementById("sidebar");
+        const textElements = sidebar.querySelectorAll(".sidebar-text");
+        const mainContent = document.getElementById("mainContent");
+  
+        if (sidebar.classList.contains("w-20")) {
+          sidebar.classList.remove("w-20");
+          sidebar.classList.add("w-64");
+          textElements.forEach(el => el.classList.remove("hidden"));
+          mainContent.style.marginLeft = "16rem";
+        } else {
+          sidebar.classList.remove("w-64");
+          sidebar.classList.add("w-20");
+          textElements.forEach(el => el.classList.add("hidden"));
+          mainContent.style.marginLeft = "4rem";
+        }
+      }
+  
+      // Récupérer les statistiques depuis le backend
+      async function fetchStats() {
+        try {
+          const headers = { 'Authorization': `Bearer ${token}` };
+  
+          const [usersRes, estabRes, deptRes, rdvRes, activeUsersRes] = await Promise.all([
+            fetch('/api/statistiques/utilisateurs', { headers }),
+            fetch('/api/statistiques/etablissements', { headers }),
+            fetch('/api/statistiques/departements', { headers }),
+            fetch('/api/statistiques/rendezvous', { headers }),
+            fetch('/api/statistiques/utilisateurs-actifs', { headers }),
+          ]);
+  
+          if (!usersRes.ok || !estabRes.ok || !deptRes.ok || !rdvRes.ok || !activeUsersRes.ok) {
+            throw new Error('Erreur lors du chargement des statistiques');
+          }
+  
+          const totalUsers = await usersRes.json();
+          const totalEstab = await estabRes.json();
+          const totalDept = await deptRes.json();
+          const totalRDV = await rdvRes.json();
+          const activeUsers = await activeUsersRes.json();
+  
+          document.getElementById('total-users').textContent = totalUsers.count;
+          document.getElementById('total-establishments').textContent = totalEstab.count;
+          document.getElementById('total-departments').textContent = totalDept.count;
+          document.getElementById('total-appointments').textContent = totalRDV.count;
+          document.getElementById('active-users-today').textContent = activeUsers.count;
+        } catch (error) {
+          console.error(error);
+          document.querySelectorAll('#total-users, #total-establishments, #total-departments, #total-appointments, #active-users-today')
+            .forEach(el => el.textContent = 'Erreur');
+        }
+      }
+  
+      // Appeler la fonction au chargement de la page
+      fetchStats();
+  </script>
+  
+
+</body>
+</html>

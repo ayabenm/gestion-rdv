@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestion des Rendez-vous Publics</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+        integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"
+        integrity="sha512-xodZBNTC5n17Xt2atTPvknjVvVyJZLgmPmcZlT4YKOBriA1jqk/m9GYV3UZgwvnK7K986JxyKGPKDGGTKFWQQ=="
+        crossorigin="" />
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"
+        integrity="sha512-XQoYMCIW9gGwiAq6Bya9JpFGK8w5qJkmGIZ0Yp+rT3vhxwTZAwN3jGeqZhZTg7o7zMKnR02aZTzQyrYKJ6qiQ=="
+        crossorigin=""></script>
+
+    <style>
+        /* Custom CSS pour un look moderne et professionnel */
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f7faff;
+            color: #343a40;
+            line-height: 1.6;
+        }
+
+        .hero-section {
+            background: linear-gradient(135deg, #5c6bc0, #3949ab);
+            color: #fff;
+            padding: 6rem 0;
+            position: relative;
+            overflow: hidden;
+            /* Ensure wave doesn't overflow */
+        }
+
+        .hero-section::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 100px;
+            /* Adjust height as needed */
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 120" preserveAspectRatio="none"><path d="M0,0 C200,60 400,60 600,0 L1200,0 L1200,120 L0,120 Z" fill="%23f7faff"></path></svg>');
+            background-size: cover;
+          
+        }
+
+        .feature-card {
+            background-color: #fff;
+            border-radius: 12px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+            transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+            padding: 2.5rem;
+            text-align: center;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 12px 28px rgba(0, 0, 0, 0.12);
+        }
+
+        .establishment-card {
+            background-color: #fff;
+            border-radius: 12px;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.06);
+            transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+            overflow: hidden;
+        }
+
+        .establishment-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 22px rgba(0, 0, 0, 0.1);
+        }
+
+        .establishment-card img {
+            transition: transform 0.3s ease-in-out;
+        }
+
+        .establishment-card:hover img {
+            transform: scale(1.05);
+        }
+
+        .stats-card {
+            background-color: #fff;
+            border-radius: 12px;
+            box-shadow: 0 5px 12px rgba(0, 0, 0, 0.05);
+            padding: 2rem;
+            text-align: center;
+        }
+
+        .testimonial-section {
+            background: linear-gradient(to right, #e3f2fd, #bbdefb);
+            padding: 6rem 0;
+        }
+
+        .testimonial-card {
+            background-color: rgba(255, 255, 255, 0.8);
+            border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.04);
+            padding: 2.5rem;
+            border-left: 5px solid #4CAF50;
+            /* Accent vert */
+            backdrop-filter: blur(10px);
+            /* Add blur effect */
+        }
+
+        /* Animation subtle pour les sections */
+        section {
+            opacity: 0;
+            transform: translateY(30px);
+            animation: fadeInUp 0.9s forwards ease-out;
+        }
+
+        @keyframes fadeInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Enhanced Navbar Styles */
+        nav {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background-color: rgba(255, 255, 255, 0.95);
+            /* Semi-transparent background */
+            backdrop-filter: blur(5px);
+            /* Add blur effect */
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            /* Subtle shadow */
+        }
+
+        nav .container {
+            padding-top: 1rem;
+            padding-bottom: 1rem;
+        }
+
+        nav a {
+            transition: color 0.3s ease-in-out;
+        }
+
+        nav a:hover {
+            color: #4CAF50;
+            /* Highlight on hover */
+        }
+
+        /* Button Styles */
+        .btn-primary {
+            background-color: #4CAF50;
+            color: #fff;
+            padding: 14px 28px;
+            border-radius: 8px;
+            font-weight: 500;
+            transition: background-color 0.3s ease-in-out;
+        }
+
+        .btn-primary:hover {
+            background-color: #43A047;
+        }
+
+        /* Footer Styles */
+        footer {
+            background-color: #343a40;
+            color: #fff;
+            padding: 3rem 0;
+        }
+
+        /* Utility Classes */
+        .section-title {
+            font-size: 2.75rem;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 2.5rem;
+            text-align: center;
+        }
+
+        .text-muted {
+            color: #6c757d;
+        }
+
+        #map {
+            height: 300px;
+            border-radius: 12px;
+        }
+    </style>
+</head>
+
+<body class="antialiased">
+
+    <!-- Barre de navigation -->
+    <nav>
+        <div class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <a href="#" class="text-2xl font-semibold text-gray-800">
+                <i class="fas fa-calendar-alt mr-2"></i> Rendez-vous Publics
+            </a>
+            <div class="space-x-6">
+                <a href="#services" class="text-gray-700 hover:text-blue-600 transition">Services</a>
+                <a href="#etablissements" class="text-gray-700 hover:text-blue-600 transition">Établissements</a>
+                <a href="#guide" class="text-gray-700 hover:text-blue-600 transition">Guide</a>
+                <a href="#faq" class="text-gray-700 hover:text-blue-600 transition">FAQ</a>
+                <a href="#stats" class="text-gray-700 hover:text-blue-600 transition">Pourquoi Nous Choisir</a>
+                <a href="register.html" class="btn-primary">
+                    <i class="fas fa-user-plus mr-1"></i> S'inscrire
+                </a>
+                <a href="login.html" class="text-blue-600 hover:text-blue-700 transition">
+                    <i class="fas fa-sign-in-alt mr-1"></i> Se Connecter
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Section Hero -->
+    <header class="hero-section text-center">
+        <div class="container mx-auto px-6">
+            <h1 class="text-4xl font-bold mb-4">Rendez-vous Publics: Simplifiez vos démarches administratives</h1>
+            <p class="text-lg mb-6">Accédez facilement aux services publics, prenez des rendez-vous en ligne et gagnez
+                du temps. Nous vous guidons à chaque étape !</p>
+            <a href="#guide" class="bg-blue-200 text-blue-700 px-6 py-3 rounded-md hover:bg-blue-300 transition">
+                <i class="fas fa-question-circle mr-1"></i> Comment ça marche ?
+            </a>
+            <a href="#" class="btn-primary">
+                <i class="fas fa-calendar-check mr-1"></i> Réserver un Rendez-vous
+            </a>
+
+        </div>
+    </header>
+
+    <!-- Section Services -->
+    <section id="services" class="py-16">
+        <div class="container mx-auto px-6">
+            <h2 class="section-title">Nos Services</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <!-- Carte Service 1 -->
+                <div class="feature-card">
+                    <i class="fas fa-calendar-day text-4xl text-blue-600 mb-4"></i>
+                    <h3 class="text-xl font-semibold">Prise de Rendez-vous Facile</h3>
+                    <p class="text-muted">Réservez votre créneau en quelques clics.</p>
+                </div>
+                <!-- Carte Service 2 -->
+                <div class="feature-card">
+                    <i class="fas fa-clock text-4xl text-green-600 mb-4"></i>
+                    <h3 class="text-xl font-semibold">Gain de Temps</h3>
+                    <p class="text-muted">Évitez les files d'attente et gagnez du temps.</p>
+                </div>
+                <!-- Carte Service 3 -->
+                <div class="feature-card">
+                    <i class="fas fa-bell text-4xl text-indigo-600 mb-4"></i>
+                    <h3 class="text-xl font-semibold">Notifications Intelligentes</h3>
+                    <p class="text-muted">Recevez des rappels par SMS et email.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section Guide -->
+    <section id="guide" class="py-16 bg-gray-100">
+        <div class="container mx-auto px-6">
+            <h2 class="section-title">Comment ça marche ?</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div>
+                    <h3 class="text-2xl font-semibold mb-4">Étape 1: Inscription</h3>
+                    <p class="text-gray-700 mb-4">Créez votre compte en quelques secondes. Nous vous demanderons des
+                        informations de base pour faciliter la prise de rendez-vous.</p>
+                    <h3 class="text-2xl font-semibold mb-4">Étape 2: Sélection de l'établissement</h3>
+                    <p class="text-gray-700 mb-4">Choisissez l'établissement public avec lequel vous souhaitez prendre
+                        rendez-vous parmi notre liste de partenaires.</p>
+                    <h3 class="text-2xl font-semibold mb-4">Étape 3: Prise de rendez-vous</h3>
+                    <p class="text-gray-700 mb-4">Sélectionnez le service, la date et l'heure qui vous conviennent, et
+                        confirmez votre rendez-vous.</p>
+                    <h3 class="text-2xl font-semibold mb-4">Étape 4: Confirmation et Rappels</h3>
+                    <p class="text-gray-700 mb-4">Recevez une confirmation immédiate et des rappels personnalisés pour
+                        ne jamais manquer votre rendez-vous.</p>
+                </div>
+                <div>
+                    <img src="https://img.freepik.com/vecteurs-libre/illustration-concept-rendez-vous_114360-1391.jpg?size=626&ext=jpg&ga=GA1.1.1412446722.1715452800&semt=ais"
+                        alt="Illustration du processus" class="w-full rounded-lg shadow-md" />
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FAQ Section -->
+    <section id="faq" class="py-16">
+        <div class="container mx-auto px-6">
+            <h2 class="section-title">Foire Aux Questions (FAQ)</h2>
+            <div class="grid grid-cols-1 gap-8">
+                <!-- Question 1 -->
+                <div>
+                    <h3 class="text-xl font-semibold mb-2">Comment puis-je prendre un rendez-vous ?</h3>
+                    <p class="text-gray-700">Inscrivez-vous, choisissez un établissement, sélectionnez un service, et
+                        choisissez la date et l'heure de votre rendez-vous.</p>
+                </div>
+                <!-- Question 2 -->
+                <div>
+                    <h3 class="text-xl font-semibold mb-2">Que faire si je dois annuler mon rendez-vous ?</h3>
+                    <p class="text-gray-700">Connectez-vous à votre compte, trouvez le rendez-vous dans votre liste et
+                        cliquez sur "Annuler".</p>
+                </div>
+                <!-- Question 3 -->
+                <div>
+                    <h3 class="text-xl font-semibold mb-2">Est-ce que ce service est gratuit ?</h3>
+                    <p class="text-gray-700">Oui, la prise de rendez-vous via notre plateforme est entièrement gratuite.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section Établissements -->
+    <section id="etablissements" class="py-16 bg-gray-100">
+        <div class="container mx-auto px-6">
+            <h2 class="section-title">Établissements Partenaires</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+
+                <!-- Carte Établissement 1 -->
+                <div class="establishment-card">
+                    <img src="https://www.tunisie-tribune.com/wp-content/uploads/2018/08/nouvelles-nominations-a-la-presidence-du-gouvernement.jpg"
+                        alt="Présidence du Gouvernement" class="w-full h-48 object-cover">
+                    <div class="p-4">
+                        <h3 class="text-xl font-semibold mb-2">Présidence du Gouvernement</h3>
+                        <p class="text-muted mb-2">Siège du pouvoir exécutif tunisien, responsable de la coordination et
+                            de la mise en œuvre des politiques gouvernementales.</p>
+                        <p class="text-sm text-gray-500 mb-2"><i class="fas fa-map-marker-alt mr-1"></i> Kasbah, Tunis
+                        </p>
+                        <!-- Location link -->
+                        <a href="https://www.pm.gov.tn/fr/" target="_blank"
+                            class="text-blue-500 hover:underline block mb-2">Site Web Officiel</a>
+                        <a href="https://www.google.com/maps/place/Kasbah,+Tunis" target="_blank"
+                            class="text-blue-500 hover:underline">Voir sur la carte</a>
+                    </div>
+                </div>
+
+                <!-- Carte Établissement 2 -->
+                <div class="establishment-card">
+                    <img src="https://www.tunisienumerique.com/wp-content/uploads/2021/01/Minist%C3%A8re-des-affaires-%C3%A9trang%C3%A8res.jpg"
+                        alt="Ministère des Affaires Étrangères" class="w-full h-48 object-cover">
+                    <div class="p-4">
+                        <h3 class="text-xl font-semibold mb-2">Ministère des Affaires Étrangères</h3>
+                        <p class="text-muted mb-2">Chargé des relations diplomatiques de la Tunisie avec les autres pays
+                            et organisations internationales. Services consulaires disponibles.</p>
+                        <p class="text-sm text-gray-500 mb-2"><i class="fas fa-map-marker-alt mr-1"></i> Avenue de la
+                            Ligue Arabe, Tunis</p>
+                        <!-- Location link -->
+                        <a href="https://www.diplomatie.gov.tn/fr/" target="_blank"
+                            class="text-blue-500 hover:underline block mb-2">Site Web Officiel</a>
+                        <a href="https://maps.app.goo.gl/sEER3j4Lh9fAxxec8" target="_blank"
+                            class="text-blue-500 hover:underline">Voir sur la carte</a>
+                    </div>
+                </div>
+
+                <!-- Carte Établissement 3 -->
+                <div class="establishment-card">
+                    <img src="https://tuniscope.com/uploads/images/content/ministere-des-finances071122.jpg"
+                        alt="Ministère des Finances" class="w-full h-48 object-cover">
+                    <div class="p-4">
+                        <h3 class="text-xl font-semibold mb-2">Ministère des Finances</h3>
+                        <p class="text-muted mb-2">Responsable de la politique économique et financière de la Tunisie, y
+                            compris la gestion du budget de l'État et des impôts.</p>
+                        <p class="text-sm text-gray-500 mb-2"><i class="fas fa-map-marker-alt mr-1"></i> Rue de la
+                            Monnaie, Tunis</p>
+                        <!-- Location link -->
+                        <a href="https://www.finances.gov.tn/fr" target="_blank"
+                            class="text-blue-500 hover:underline block mb-2">Site Web Officiel</a>
+                        <a href="https://maps.app.goo.gl/WjG9c3K5j5B9t6F97" target="_blank"
+                            class="text-blue-500 hover:underline">Voir sur la carte</a>
+                    </div>
+                </div>
+
+                <!-- Carte Établissement 4 -->
+                <div class="establishment-card">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/d/df/Si%C3%A8ge_du_Gouvernorat_de_Tunis%2C_2019.jpg/1024px-Si%C3%A8ge_du_Gouvernorat_de_Tunis%2C_2019.jpg"
+                        alt="Gouvernorat de Tunis" class="w-full h-48 object-cover">
+                    <div class="p-4">
+                        <h3 class="text-xl font-semibold mb-2">Gouvernorat de Tunis</h3>
+                        <p class="text-muted mb-2">Administration régionale chargée de la coordination des services
+                            publics et du développement local dans la région de Tunis.</p>
+                        <p class="text-sm text-gray-500 mb-2"><i class="fas fa-map-marker-alt mr-1"></i> Avenue de la
+                            République, Tunis</p>
+                        <!-- Location link -->
+                        <a href="https://www.tunis.gov.tn/" target="_blank"
+                            class="text-blue-500 hover:underline block mb-2">Site Web Officiel</a>
+                        <a href="https://www.google.com/maps/place/Gouvernorat+de+Tunis" target="_blank"
+                            class="text-blue-500 hover:underline">Voir sur la carte</a>
+                    </div>
+                </div>
+
+                <!-- Carte Établissement 5 -->
+                <div class="establishment-card">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/9b/Municipalite_de_Tunis-Kassus.jpg/1200px-Municipalite_de_Tunis-Kassus.jpg"
+                        alt="Municipalité de Tunis" class="w-full h-48 object-cover">
+                    <div class="p-4">
+                        <h3 class="text-xl font-semibold mb-2">Municipalité de Tunis</h3>
+                        <p class="text-muted mb-2">Responsable des services municipaux, de l'urbanisme et de la gestion
+                            locale de la ville de Tunis.</p>
+                        <p class="text-sm text-gray-500 mb-2"><i class="fas fa-map-marker-alt mr-1"></i> Place de la
+                            Kasbah, Tunis</p>
+                        <!-- Location link -->
+                        <a href="https://www.commune-tunis.gov.tn/" target="_blank"
+                            class="text-blue-500 hover:underline block mb-2">Site Web Officiel</a>
+                        <a href="https://maps.app.goo.gl/jAfE7JmGAWRwVXRV6" target="_blank"
+                            class="text-blue-500 hover:underline">Voir sur la carte</a>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- Section Statistiques Impactantes -->
+    <section id="stats" class="py-16 bg-gray-100">
+        <div class="container mx-auto px-6">
+            <h2 class="section-title">Pourquoi Choisir Notre Plateforme ?</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+
+                <!-- Statistique 1 -->
+                <div class="stats-card">
+                    <i class="fas fa-check-circle text-4xl text-green-500 mb-4"></i>
+                    <p class="text-4xl font-bold text-gray-700">95%</p>
+                    <p class="text-muted">Taux de satisfaction des utilisateurs</p>
+                </div>
+
+                <!-- Statistique 2 -->
+                <div class="stats-card">
+                    <i class="fas fa-clock text-4xl text-blue-500 mb-4"></i>
+                    <p class="text-4xl font-bold text-gray-700">50%</p>
+                    <p class="text-muted">Réduction du temps d'attente moyen</p>
+                </div>
+
+                <!-- Statistique 3 -->
+                <div class="stats-card">
+                    <i class="fas fa-users text-4xl text-purple-500 mb-4"></i>
+                    <p class="text-4xl font-bold text-gray-700">10,000+</p>
+                    <p class="text-muted">Utilisateurs actifs chaque mois</p>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white py-8">
+        <div class="container mx-auto px-6 text-center">
+            <p>&copy; 2025 Gestion des Rendez-vous Publics. Tous droits réservés.</p>
+        </div>
+    </footer>
+
+</body>
+
+</html>

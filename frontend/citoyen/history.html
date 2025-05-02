@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Historique - Citoyen</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+
+  <style>
+    @keyframes fadeInUp {
+      0% {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+
+      100% {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .fadeInUp {
+      animation: fadeInUp 0.5s ease-out;
+    }
+
+    /* Nouveau style de carte moderne */
+    .card {
+      background: #ffffff;
+      /* Fond blanc pour la carte */
+      border-radius: 16px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+      /* Ombre douce et subtile */
+      padding: 24px;
+      margin-bottom: 20px;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      border-left: 4px solid #4c51bf;
+      /* Bordure colorée à gauche pour moderniser */
+    }
+
+    .card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+      /* Ombre plus forte au survol */
+    }
+
+    /* Sidebar transition */
+    #sidebar {
+      transition: all 0.3s ease;
+      position: fixed;
+      height: 100vh;
+      z-index: 20;
+    }
+
+    #mainContent {
+      transition: margin-left 0.3s ease;
+      margin-left: 4rem;
+      /* espace initial de 4rem pour le sidebar */
+      width: 100%;
+    }
+
+    /* Transition pour le main lorsque le sidebar est ouvert/fermé */
+    #mainContent {
+      transition: margin-left 0.3s ease;
+    }
+  </style>
+</head>
+
+<body class="bg-white font-sans text-gray-900">
+
+  <!-- Sidebar -->
+  <div id="sidebar"
+    class="bg-gradient-to-r from-gray-900 to-gray-800 text-white h-screen w-20 transition-all duration-300 flex flex-col shadow-lg">
+    <!-- Top -->
+    <div class="flex items-center justify-center p-6 border-b border-gray-700 flex-shrink-0">
+      <li onclick="toggleSidebar()"
+        class="px-6 py-4 flex items-center justify-center gap-4 hover:bg-orange-600 cursor-pointer transition duration-200 rounded-lg">
+        <i class="fas fa-bars"></i>
+      </li>
+    </div>
+    <!-- Menu -->
+    <ul class="flex-1 mt-6 space-y-4">
+      <li class="px-6 py-4 flex items-center gap-4 hover:bg-orange-600 hover:shadow-md transition duration-200 rounded-lg">
+        <i class="fas fa-home w-6 text-center"></i>
+        <span class="sidebar-text hidden"><a href="dashboard.html"
+            class="block hover:text-gray-300">Dashboard</a></span>
+      </li>
+      <li
+        class="px-6 py-4 flex items-center gap-4 hover:bg-orange-600 hover:shadow-md transition duration-200 rounded-lg">
+        <i class="fas fa-calendar-plus w-6 text-center"></i>
+        <span class="sidebar-text hidden"><a href="appointment.html"
+            class="block hover:text-gray-300">Rendez-vous</a></span>
+      </li>
+      <li
+        class="px-6 py-4 flex items-center gap-4 bg-orange-600 text-white rounded-lg">
+        <i class="fas fa-history w-6 text-center"></i>
+        <span class="sidebar-text hidden"><a href="history.html"
+            class="block hover:text-gray-300">Historique</a></span>
+      </li>
+      <li
+        class="px-6 py-4 flex items-center gap-4 hover:bg-orange-600 hover:shadow-md transition duration-200 rounded-lg">
+        <i class="fas fa-id-card w-6 text-center"></i>
+        <span class="sidebar-text hidden"><a href="profile.html" class="block hover:text-gray-300">Profil</a></span>
+      </li>
+    </ul>
+
+    <!-- Footer -->
+    <div class="p-4 border-t border-gray-700">
+      <button onclick="logout()"
+        class="bg-red-600 hover:bg-red-700 w-full py-3 rounded-lg flex items-center justify-center gap-2">
+        <i class="fas fa-sign-out-alt"></i>
+        <span class="sidebar-text hidden">Déconnexion</span>
+      </button>
+    </div>
+  </div>
+  <!-- Main Content -->
+  <div id="mainContent" class="flex-1 p-8 transition-all duration-300">
+    <header class="bg-orange-600 text-white py-6 px-8 shadow-lg rounded-lg flex items-center justify-between">
+      <h1 class="text-3xl font-bold">📅 Mes Rendez-vous</h1>
+    </header>
+    <!-- Content -->
+<div class="content w-full pt-8">
+  <h1 class="text-3xl font-bold text-gray-800 mb-8 text-center">📋 Historique de mes Rendez-vous</h1>
+
+  <!-- Table -->
+  <div class="bg-white shadow-lg rounded-2xl overflow-hidden table-container max-w-7xl mx-auto">
+    <table class="min-w-full text-sm text-left text-gray-700">
+      <thead class="bg-gray-100 text-gray-600 uppercase text-xs font-semibold">
+        <tr>
+          <th class="px-6 py-4">Établissement</th>
+          <th class="px-6 py-4">Département</th>
+          <th class="px-6 py-4">Service</th>
+          <th class="px-6 py-4">Date</th>
+          <th class="px-6 py-4">Date preferer</th>
+          <th class="px-6 py-4">Deadline</th>
+          <th class="px-6 py-4">Statut</th>
+          <th class="px-6 py-4">Action</th>
+        </tr>
+      </thead>
+      <tbody id="appointmentsTable">
+        <!-- Les rendez-vous seront remplis ici dynamiquement -->
+      </tbody>
+    </table>
+  </div>
+</div>
+
+</body>
+<script>
+  // Vérification du token JWT
+  const token = localStorage.getItem('token');
+  const loginURL = '/rdv/frontend/login.html';
+  if (!token) {
+    window.location.href = loginURL;  // Rediriger vers la page de connexion
+  }
+
+  // Fonction de déconnexion
+  function logout() {
+    localStorage.removeItem('token');
+    window.location.href = loginURL;
+  }
+  // Fonction pour basculer l'état du sidebar
+  function toggleSidebar() {
+    const sidebar = document.getElementById("sidebar");
+    const textElements = sidebar.querySelectorAll(".sidebar-text");
+    const mainContent = document.getElementById("mainContent");
+
+    if (sidebar.classList.contains("w-20")) {
+      sidebar.classList.remove("w-20");
+      sidebar.classList.add("w-64");
+      textElements.forEach(el => el.classList.remove("hidden"));
+      mainContent.style.marginLeft = "16rem"; /* augmenté à 16rem lorsque sidebar est ouvert */
+    } else {
+      sidebar.classList.remove("w-64");
+      sidebar.classList.add("w-20");
+      textElements.forEach(el => el.classList.add("hidden"));
+      mainContent.style.marginLeft = "4rem"; /* espace initial de 4rem */
+    }
+  }
+</script>
+<script>
+  const API_BASE_URL = "http://localhost:3000/api/";
+
+  const titleCase = (s) => s.replace(/^_*(.)|_+(.)/g, (s, c, d) => c ? c.toUpperCase() : ' ' + d.toUpperCase())
+
+  // Fonction pour récupérer les rendez-vous
+  function getAppointments() {
+    fetch(API_BASE_URL + 'appointments', {
+      method: 'GET',
+      headers: {
+        "Authorization": token,
+        "Content-Type": "application/json"
+      }
+    })
+      .then(response => response.json())
+      .then(data => {
+        const appointmentsTable = document.getElementById('appointmentsTable');
+        appointmentsTable.innerHTML = ''; // Vider la table avant de remplir les nouvelles données
+        data.forEach(appointment => {
+          const row = document.createElement('tr');
+          row.classList.add('border-b', 'hover:bg-gray-50');
+          row.innerHTML = `
+            <td class="px-6 py-4">${appointment.establishment}</td>
+            <td class="px-6 py-4">${appointment.department}</td>
+            <td class="px-6 py-4">${appointment.service}</td>
+            <td class="px-6 py-4">${new Date(appointment.date).toLocaleDateString()}</td>
+            <td class="px-6 py-4">${new Date(appointment.preferred_date).toLocaleDateString()}</td>
+            <td class="px-6 py-4">${new Date(appointment.deadline).toLocaleDateString()}</td>
+            <td class="px-6 py-4">
+              <span class="bg-${appointment.statut === 'validé' ? 'green' : appointment.statut === 'annulé' ? 'red' : 'yellow'}-100 text-${appointment.statut === 'validé' ? 'green' : appointment.statut === 'annulé' ? 'red' : 'yellow'}-700 px-3 py-1 rounded-full text-xs font-medium">${titleCase(appointment.statut)}</span>
+            </td>
+            <td class="px-6 py-4">
+              <button class="bg-red-500 text-white px-4 py-2 rounded-md text-xs" onclick="cancelAppointment(${appointment.id})">Annuler</button>
+            </td>
+          `;
+          appointmentsTable.appendChild(row);
+        });
+      })
+      .catch(error => {
+        console.error("Erreur lors de la récupération des rendez-vous", error);
+      });
+  }
+
+  // Fonction pour annuler un rendez-vous
+  function cancelAppointment(appointmentId) {
+    if (confirm("Êtes-vous sûr de vouloir annuler ce rendez-vous ?")) {
+      fetch(API_BASE_URL + `appointments/${appointmentId}`, {
+        method: 'PUT',
+        headers: {
+          "Authorization": token,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ status: 'annulé' })
+      })
+        .then(response => response.json())
+        .then(data => {
+          alert(data.message);
+          getAppointments(); // Recharger la liste des rendez-vous
+        })
+        .catch(error => {
+          console.error("Erreur lors de l'annulation du rendez-vous", error);
+        });
+    }
+  }
+  // Initialiser les rendez-vous
+  getAppointments();
+</script>
+</html>
