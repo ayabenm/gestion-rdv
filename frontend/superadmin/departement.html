@@ -10,8 +10,10 @@
   <style>
     /* Transition pour le main lorsque le sidebar est ouvert/fermé */
     #mainContent {
-      transition: margin-left 0.3s ease;
-    }
+  margin-left: 1rem; /* fixe à 5rem peu importe l'état */
+  transition: none;  /* ou garde la transition si tu veux un petit effet */
+}
+   
   </style>
 </head>
 
@@ -160,12 +162,12 @@
         sidebar.classList.remove("w-20");
         sidebar.classList.add("w-64");
         textElements.forEach(el => el.classList.remove("hidden"));
-        mainContent.style.marginLeft = "16rem"; /* augmenté à 16rem lorsque sidebar est ouvert */
+        
       } else {
         sidebar.classList.remove("w-64");
         sidebar.classList.add("w-20");
         textElements.forEach(el => el.classList.add("hidden"));
-        mainContent.style.marginLeft = "4rem"; /* espace initial de 4rem */
+        
       }
     }
   </script>

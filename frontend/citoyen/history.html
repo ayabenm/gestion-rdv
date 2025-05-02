@@ -185,65 +185,72 @@
   const titleCase = (s) => s.replace(/^_*(.)|_+(.)/g, (s, c, d) => c ? c.toUpperCase() : ' ' + d.toUpperCase())
 
   // Fonction pour récupérer les rendez-vous
-  function getAppointments() {
-    fetch(API_BASE_URL + 'appointments', {
-      method: 'GET',
+function getAppointments() {
+  fetch(API_BASE_URL + 'appointments', {
+    method: 'GET',
+    headers: {
+      "Authorization": token,
+      "Content-Type": "application/json"
+    }
+  })
+  .then(response => response.json())
+  .then(data => {
+    const appointmentsTable = document.getElementById('appointmentsTable');
+    appointmentsTable.innerHTML = ''; // Vider la table avant de remplir les nouvelles données
+    data.forEach(appointment => {
+      const row = document.createElement('tr');
+      row.classList.add('border-b', 'hover:bg-gray-50');
+      row.innerHTML = `
+        <td class="px-6 py-4">${appointment.establishment}</td>
+        <td class="px-6 py-4">${appointment.department}</td>
+        <td class="px-6 py-4">${appointment.service}</td>
+        <td class="px-6 py-4">${new Date(appointment.date).toLocaleDateString()}</td>
+        <td class="px-6 py-4">${new Date(appointment.preferred_date).toLocaleDateString()}</td>
+        <td class="px-6 py-4">${new Date(appointment.deadline).toLocaleDateString()}</td>
+        <td class="px-6 py-4">
+          <span class="bg-${appointment.statut === 'validé' ? 'green' : appointment.statut === 'annulé' ? 'red' : 'yellow'}-100 text-${appointment.statut === 'validé' ? 'green' : appointment.statut === 'annulé' ? 'red' : 'yellow'}-700 px-3 py-1 rounded-full text-xs font-medium">${titleCase(appointment.statut)}</span>
+        </td>
+        <td class="px-6 py-4">
+          <button class="bg-red-500 text-white px-4 py-2 rounded-md text-xs ${appointment.statut === 'annulé' ? 'bg-gray-300 cursor-not-allowed' : ''}" 
+            onclick="cancelAppointment(${appointment.id}, this)" 
+            ${appointment.statut === 'annulé' ? 'disabled' : ''}>Annuler</button>
+        </td>
+      `;
+      appointmentsTable.appendChild(row);
+    });
+  })
+  .catch(error => {
+    console.error("Erreur lors de la récupération des rendez-vous", error);
+  });
+}
+
+// Fonction pour annuler un rendez-vous
+function cancelAppointment(appointmentId, button) {
+  if (confirm("Êtes-vous sûr de vouloir annuler ce rendez-vous ?")) {
+    fetch(API_BASE_URL + `appointments/${appointmentId}`, {
+      method: 'PUT',
       headers: {
         "Authorization": token,
         "Content-Type": "application/json"
-      }
+      },
+      body: JSON.stringify({ status: 'annulé' })
     })
-      .then(response => response.json())
-      .then(data => {
-        const appointmentsTable = document.getElementById('appointmentsTable');
-        appointmentsTable.innerHTML = ''; // Vider la table avant de remplir les nouvelles données
-        data.forEach(appointment => {
-          const row = document.createElement('tr');
-          row.classList.add('border-b', 'hover:bg-gray-50');
-          row.innerHTML = `
-            <td class="px-6 py-4">${appointment.establishment}</td>
-            <td class="px-6 py-4">${appointment.department}</td>
-            <td class="px-6 py-4">${appointment.service}</td>
-            <td class="px-6 py-4">${new Date(appointment.date).toLocaleDateString()}</td>
-            <td class="px-6 py-4">${new Date(appointment.preferred_date).toLocaleDateString()}</td>
-            <td class="px-6 py-4">${new Date(appointment.deadline).toLocaleDateString()}</td>
-            <td class="px-6 py-4">
-              <span class="bg-${appointment.statut === 'validé' ? 'green' : appointment.statut === 'annulé' ? 'red' : 'yellow'}-100 text-${appointment.statut === 'validé' ? 'green' : appointment.statut === 'annulé' ? 'red' : 'yellow'}-700 px-3 py-1 rounded-full text-xs font-medium">${titleCase(appointment.statut)}</span>
-            </td>
-            <td class="px-6 py-4">
-              <button class="bg-red-500 text-white px-4 py-2 rounded-md text-xs" onclick="cancelAppointment(${appointment.id})">Annuler</button>
-            </td>
-          `;
-          appointmentsTable.appendChild(row);
-        });
-      })
-      .catch(error => {
-        console.error("Erreur lors de la récupération des rendez-vous", error);
-      });
+    .then(response => response.json())
+    .then(data => {
+      alert(data.message);
+      button.disabled = true; // Désactive le bouton après annulation
+      button.classList.remove('bg-red-500'); // Retirer la couleur rouge d'origine
+      button.classList.add('bg-gray-300', 'cursor-not-allowed'); // Appliquer la couleur grise après annulation
+      getAppointments(); // Recharger la liste des rendez-vous
+    })
+    .catch(error => {
+      console.error("Erreur lors de l'annulation du rendez-vous", error);
+    });
   }
+}
 
-  // Fonction pour annuler un rendez-vous
-  function cancelAppointment(appointmentId) {
-    if (confirm("Êtes-vous sûr de vouloir annuler ce rendez-vous ?")) {
-      fetch(API_BASE_URL + `appointments/${appointmentId}`, {
-        method: 'PUT',
-        headers: {
-          "Authorization": token,
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({ status: 'annulé' })
-      })
-        .then(response => response.json())
-        .then(data => {
-          alert(data.message);
-          getAppointments(); // Recharger la liste des rendez-vous
-        })
-        .catch(error => {
-          console.error("Erreur lors de l'annulation du rendez-vous", error);
-        });
-    }
-  }
-  // Initialiser les rendez-vous
-  getAppointments();
+// Initialiser les rendez-vous
+getAppointments();
+
 </script>
 </html>

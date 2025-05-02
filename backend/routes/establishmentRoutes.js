@@ -47,6 +47,35 @@ router.post('/', async (req, res) => {
         res.status(500).json({ error: err.message });
     }
 });
+// Route PUT mise à jour
+router.put('/:id', async (req, res) => {
+    try {
+        const { name, address, phone, email } = req.body;
 
+        if (!name || !address || !phone || !email) {
+            return res.status(400).json({ error: 'Tous les champs sont requis' });
+        }
+
+        const etablissement = await Establishment.getById(req.params.id);
+        if (!etablissement) {
+            return res.status(404).json({ error: 'Établissement non trouvé' });
+        }
+
+        await Establishment.updateEstablishment(req.params.id, req.body);
+        res.status(200).json({ message: 'Établissement mis à jour' });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+// Route DELETE suppression
+router.delete('/:id', async (req, res) => {
+    try {
+        await Establishment.deleteEstablishment(req.params.id);
+        res.status(200).json({ message: 'Établissement supprimé' });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
 
 module.exports = router;

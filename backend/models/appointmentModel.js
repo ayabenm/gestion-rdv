@@ -12,7 +12,7 @@ createAppointment : ({ citoyen_id, establishment_id, departement_id, service_id,
 
 // Requête pour récupérer tous les rendez-vous d'un citoyen
 getAppointmentsByCitizen : (citoyenId, callback) => {
-  const sql = 'SELECT a.id AS id, a.date_rdv AS date,a.preferred_date AS preferred_date, a.deadline AS deadline, a.statut AS statut, e.name AS establishment, d.name AS department, s.name AS service, s.priority AS service_priority FROM appointments a JOIN establishments e ON a.establishment_id = e.id JOIN departements d ON a.departement_id = d.id JOIN services s ON a.service_id = s.id WHERE a.citoyen_id = ? ORDER BY a.date_rdv DESC';
+  const sql = 'SELECT a.id AS id, a.date_rdv AS date,a.preferred_date AS preferred_date, a.deadline AS deadline, a.statut AS statut, e.name AS establishment, d.name AS department, s.name AS service, s.priority AS service_priority FROM appointments a JOIN establishments e ON a.establishment_id = e.id JOIN departements d ON a.departement_id = d.id JOIN services s ON a.service_id = s.id WHERE a.citoyen_id = ? ORDER BY a.date_rdv ASC, a.deadline ASC';
   db.query(sql, [citoyenId], callback);
 },
 
