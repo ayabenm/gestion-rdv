@@ -7,117 +7,370 @@
     <title>Statistiques</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+    <!-- Chart.js for data visualization -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        /* Transition pour le main lorsque le sidebar est ouvert/fermé */
         #mainContent {
             transition: margin-left 0.3s ease;
+        }
+        .chart-container {
+            position: relative;
+            height: 300px;
+            width: 100%;
+        }
+        .stat-card {
+            transition: all 0.3s ease;
+        }
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
         }
     </style>
 </head>
 
 <body class="bg-gray-100 text-gray-800 font-sans flex">
-
-    <!-- Sidebar -->
+    <!-- Sidebar remains the same -->
+    <!-- ... existing sidebar code ... -->
     <div id="sidebar"
-        class="bg-gradient-to-r from-gray-900 to-gray-800 text-white h-screen w-20 transition-all duration-300 flex flex-col shadow-lg">
-        <!-- Top -->
-        <div class="flex items-center justify-center p-6 border-b border-gray-700 flex-shrink-0">
-            <li onclick="toggleSidebar()"
-                class="px-6 py-4 flex items-center justify-center gap-4 hover:bg-orange-600 cursor-pointer transition duration-200 rounded-lg">
-                <i class="fas fa-bars"></i>
-            </li>
-        </div>
-        <!-- Menu -->
-        <ul class="flex-1 mt-6 space-y-4">
-            <li
-                class="px-6 py-4 flex items-center gap-4 hover:bg-orange-600 hover:shadow-md transition duration-200 rounded-lg">
-                <i class="fas fa-home w-6 text-center"></i>
-                <span class="sidebar-text hidden"><a href="dashboard.html" class="block hover:text-gray-300">Tableau de
-                        bord</a></span>
-            </li>
-
-            <li
-                class="px-6 py-4 flex items-center gap-4 hover:bg-orange-600 hover:shadow-md transition duration-200 rounded-lg">
-                <i class="fas fa-users w-6 text-center"></i>
-                <span class="sidebar-text hidden"><a href="etablissement.html"
-                        class="block hover:text-gray-300">Établissements</a></span>
-            </li>
-            <li
-                class="px-6 py-4 flex items-center gap-4 hover:bg-orange-600 hover:shadow-md transition duration-200 rounded-lg">
-                <i class="fas fa-school w-6 text-center"></i>
-                <span class="sidebar-text hidden"><a href="departement.html"
-                        class="block hover:text-gray-300">Département</a></span>
-            </li>
-            <li
-                class="px-6 py-4 flex items-center gap-4 hover:bg-orange-600 hover:shadow-md transition duration-200 rounded-lg">
-                <i class="fas fa-building w-6 text-center"></i>
-                <span class="sidebar-text hidden"><a href="service.html"
-                        class="block hover:text-gray-300">Services</a></span>
-            </li>
-            <li class="px-6 py-4 flex items-center gap-4 bg-orange-600 text-white rounded-lg">
-                <i class="fas fa-chart-bar w-6 text-center"></i>
-                <span class="sidebar-text hidden"><a href="statistiques.html"
-                        class="block hover:text-gray-300">Statistiques</a></span>
-            </li>
-        </ul>
-
-        <!-- Footer -->
-        <div class="p-4 border-t border-gray-700">
-            <button onclick="logout()"
-                class="bg-red-600 hover:bg-red-700 w-full py-3 rounded-lg flex items-center justify-center gap-2">
-                <i class="fas fa-sign-out-alt"></i>
-                <span class="sidebar-text hidden">Déconnexion</span>
-            </button>
-        </div>
+    class="bg-gradient-to-r from-gray-900 to-gray-800 text-white h-screen w-20 transition-all duration-300 flex flex-col shadow-lg">
+    <div class="flex items-center justify-center p-6 border-b border-gray-600 flex-shrink-0">
+      <li onclick="toggleSidebar()"
+        class="px-6 py-4 flex items-center justify-center gap-4 hover:bg-orange-600 cursor-pointer transition duration-200 rounded-lg">
+        <i class="fas fa-bars text-white text-2xl"></i>
+      </li>
     </div>
+    <!-- Menu -->
+    <ul class="flex-1 mt-6 space-y-4">
+      <li class="px-6 py-4 flex items-center gap-4 bg-orange-600 text-white rounded-lg">
+        <i class="fas fa-home w-6 text-center"></i>
+        <span class="sidebar-text hidden"><a href="dashboard.html" class="block hover:text-gray-300">Tableau de
+            bord</a></span>
+      </li>
 
+      <li
+        class="px-6 py-4 flex items-center gap-4 hover:bg-orange-600 hover:shadow-md transition duration-200 rounded-lg">
+        <i class="fas fa-users w-6 text-center"></i>
+        <span class="sidebar-text hidden"><a href="etablissement.html"
+            class="block hover:text-gray-300">Établissements</a></span>
+      </li>
+      <li
+        class="px-6 py-4 flex items-center gap-4 hover:bg-orange-600 hover:shadow-md transition duration-200 rounded-lg">
+        <i class="fas fa-school w-6 text-center"></i>
+        <span class="sidebar-text hidden"><a href="departement.html"
+            class="block hover:text-gray-300">Département</a></span>
+      </li>
+      <li
+        class="px-6 py-4 flex items-center gap-4 hover:bg-orange-600 hover:shadow-md transition duration-200 rounded-lg">
+        <i class="fas fa-building w-6 text-center"></i>
+        <span class="sidebar-text hidden"><a href="service.html" class="block hover:text-gray-300">Services</a></span>
+      </li>
+      <li
+        class="px-6 py-4 flex items-center gap-4 hover:bg-orange-600 hover:shadow-md transition duration-200 rounded-lg">
+        <i class="fas fa-chart-bar w-6 text-center"></i>
+        <span class="sidebar-text hidden"><a href="statistiques.html"
+            class="block hover:text-gray-300">Statistiques</a></span>
+      </li>
+    </ul>
+
+    <div class="p-4 border-t border-gray-600">
+      <button onclick="logout()"
+        class="bg-red-600 hover:bg-red-700 w-full py-3 rounded-lg flex items-center justify-center gap-2">
+        <i class="fas fa-sign-out-alt"></i>
+        <span class="sidebar-text hidden">Déconnexion</span>
+      </button>
+    </div>
+  </div>
     <!-- Main Content -->
     <div id="mainContent" class="flex-1 p-8 transition-all duration-300 shadow-inner bg-gray-50">
-        <header class="bg-orange-600 text-white py-6 px-8 shadow-lg rounded-lg flex items-center justify-between">
-            <h1 class="text-3xl font-bold">Statistiques</h1>
+        <header class="bg-orange-600 text-white py-6 px-8 shadow-lg rounded-lg flex items-center justify-between mb-8">
+            <h1 class="text-3xl font-bold">Tableau de Bord Statistique</h1>
+            <div class="flex space-x-4">
+                <select id="timePeriod" class="px-4 py-2 rounded-lg bg-white text-gray-800">
+                    <option value="week">Cette Semaine</option>
+                    <option value="month" selected>Ce Mois</option>
+                    <option value="quarter">Ce Trimestre</option>
+                    <option value="year">Cette Année</option>
+                </select>
+            </div>
         </header>
-        <!-- Main Content -->
-        <main class="container mx-auto p-6 space-y-8 flex-grow">
-        </main>
 
+        <!-- Stats Overview Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <!-- Total Appointments -->
+            <div class="stat-card bg-white p-6 rounded-lg shadow-md border-l-4 border-blue-500">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <p class="text-gray-500">Rendez-vous</p>
+                        <h3 class="text-2xl font-bold" id="totalAppointments">0</h3>
+                    </div>
+                    <i class="fas fa-calendar-check text-blue-500 text-2xl"></i>
+                </div>
+                <p class="text-sm text-gray-500 mt-2"><span id="appointmentsChange" class="text-green-500">+0%</span> vs période précédente</p>
+            </div>
+
+            <!-- Completed Appointments -->
+            <div class="stat-card bg-white p-6 rounded-lg shadow-md border-l-4 border-green-500">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <p class="text-gray-500">Complétés</p>
+                        <h3 class="text-2xl font-bold" id="completedAppointments">0</h3>
+                    </div>
+                    <i class="fas fa-check-circle text-green-500 text-2xl"></i>
+                </div>
+                <p class="text-sm text-gray-500 mt-2"><span id="completedChange" class="text-green-500">+0%</span> taux de complétion</p>
+            </div>
+
+            <!-- Establishments -->
+            <div class="stat-card bg-white p-6 rounded-lg shadow-md border-l-4 border-purple-500">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <p class="text-gray-500">Établissements</p>
+                        <h3 class="text-2xl font-bold" id="totalEstablishments">0</h3>
+                    </div>
+                    <i class="fas fa-building text-purple-500 text-2xl"></i>
+                </div>
+                <p class="text-sm text-gray-500 mt-2"><span id="establishmentsChange" class="text-green-500">+0%</span> vs période précédente</p>
+            </div>
+
+            <!-- Active Users -->
+            <div class="stat-card bg-white p-6 rounded-lg shadow-md border-l-4 border-orange-500">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <p class="text-gray-500">Utilisateurs Actifs</p>
+                        <h3 class="text-2xl font-bold" id="activeUsers">0</h3>
+                    </div>
+                    <i class="fas fa-users text-orange-500 text-2xl"></i>
+                </div>
+                <p class="text-sm text-gray-500 mt-2"><span id="usersChange" class="text-green-500">+0%</span> activité</p>
+            </div>
+        </div>
+
+        <!-- Charts Section -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+            <!-- Appointments Chart -->
+            <div class="bg-white p-6 rounded-lg shadow-md">
+                <h3 class="text-xl font-semibold mb-4">Rendez-vous par Statut</h3>
+                <div class="chart-container">
+                    <canvas id="appointmentsChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Establishment Activity -->
+            <div class="bg-white p-6 rounded-lg shadow-md">
+                <h3 class="text-xl font-semibold mb-4">Activité par Établissement</h3>
+                <div class="chart-container">
+                    <canvas id="establishmentChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Activity Table -->
+        <div class="bg-white p-6 rounded-lg shadow-md">
+            <h3 class="text-xl font-semibold mb-4">Activité Récente</h3>
+            <div class="overflow-x-auto">
+                <table class="min-w-full bg-white">
+                    <thead>
+                        <tr class="bg-gray-100 text-gray-700">
+                            <th class="py-3 px-4 text-left">Utilisateur</th>
+                            <th class="py-3 px-4 text-left">Action</th>
+                            <th class="py-3 px-4 text-left">Établissement</th>
+                            <th class="py-3 px-4 text-left">Date</th>
+                        </tr>
+                    </thead>
+                    <tbody id="recentActivity" class="divide-y divide-gray-200">
+                        <!-- Will be populated by JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
 
     <!-- JavaScript -->
     <script>
-        // Vérification du token JWT
+        // Authentication check
         const token = localStorage.getItem('token');
         const loginURL = '/rdv/frontend/login.html';
         if (!token) {
-            window.location.href = loginURL;  // Rediriger vers la page de connexion
+            window.location.href = loginURL;
         }
 
-        // Fonction de déconnexion
+        // Parse JWT to check if user is superadmin
+        function parseJwt(token) {
+            try {
+                const base64Url = token.split('.')[1];
+                const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+                return JSON.parse(atob(base64));
+            } catch (e) {
+                return null;
+            }
+        }
+
+        const user = parseJwt(token);
+        if (user?.role !== 'superadmin') {
+            window.location.href = 'unauthorized.html';
+        }
+
+        // Logout function
         function logout() {
             localStorage.removeItem('token');
             window.location.href = loginURL;
         }
-        // Fonction pour basculer l'état du sidebar
+
+        // Toggle sidebar function
         function toggleSidebar() {
             const sidebar = document.getElementById("sidebar");
             const textElements = sidebar.querySelectorAll(".sidebar-text");
             const mainContent = document.getElementById("mainContent");
 
-            // Vérifier si le sidebar est ouvert ou fermé
             if (sidebar.classList.contains("w-20")) {
-                // Ouvrir le sidebar (afficher les icônes et les textes)
                 sidebar.classList.remove("w-20");
                 sidebar.classList.add("w-64");
-                textElements.forEach(el => el.classList.remove("hidden"));  // Afficher les textes
-                mainContent.style.marginLeft = "1cm";  // Espace réduit à 1 cm
+                textElements.forEach(el => el.classList.remove("hidden"));
+                mainContent.style.marginLeft = "1cm";
             } else {
-                // Fermer le sidebar (afficher uniquement les icônes)
                 sidebar.classList.remove("w-64");
                 sidebar.classList.add("w-20");
-                textElements.forEach(el => el.classList.add("hidden"));  // Cacher les textes
-                mainContent.style.marginLeft = "1cm";  // Espace réduit à 1 cm
+                textElements.forEach(el => el.classList.add("hidden"));
+                mainContent.style.marginLeft = "1cm";
             }
         }
+
+        // API Configuration
+        const apiUrl = "http://localhost:3000/api";
+        const headers = {
+            'Authorization': token,
+            'Content-Type': 'application/json'
+        };
+
+        // Fetch Statistics Data
+        async function fetchStatistics(timePeriod = 'month') {
+            try {
+                // Show loading state
+                document.getElementById('recentActivity').innerHTML = `
+                    <tr>
+                        <td colspan="4" class="py-4 text-center">
+                            <div class="flex justify-center">
+                                <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-500"></div>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+
+                const response = await fetch(`${apiUrl}/statistics?period=${timePeriod}`, { headers });
+                if (!response.ok) throw new Error('Failed to fetch statistics');
+                
+                const data = await response.json();
+                updateDashboard(data);
+            } catch (error) {
+                console.error("Error fetching statistics:", error);
+                alert("Erreur lors du chargement des statistiques");
+            }
+        }
+
+        // Update Dashboard with Data
+        function updateDashboard(data) {
+            // Update cards
+            document.getElementById('totalAppointments').textContent = data.totalAppointments;
+            document.getElementById('completedAppointments').textContent = data.completedAppointments;
+            document.getElementById('totalEstablishments').textContent = data.totalEstablishments;
+            document.getElementById('activeUsers').textContent = data.activeUsers;
+            
+            // Update changes
+            document.getElementById('appointmentsChange').textContent = `${data.appointmentsChange > 0 ? '+' : ''}${data.appointmentsChange}%`;
+            document.getElementById('completedChange').textContent = `${data.completedChange > 0 ? '+' : ''}${data.completedChange}%`;
+            document.getElementById('establishmentsChange').textContent = `${data.establishmentsChange > 0 ? '+' : ''}${data.establishmentsChange}%`;
+            document.getElementById('usersChange').textContent = `${data.usersChange > 0 ? '+' : ''}${data.usersChange}%`;
+
+            // Update charts
+            renderAppointmentsChart(data.appointmentsByStatus);
+            renderEstablishmentChart(data.establishmentActivity);
+
+            // Update recent activity
+            const activityTable = document.getElementById('recentActivity');
+            activityTable.innerHTML = data.recentActivity.map(activity => `
+                <tr class="hover:bg-gray-50">
+                    <td class="py-3 px-4">${activity.user}</td>
+                    <td class="py-3 px-4">${activity.action}</td>
+                    <td class="py-3 px-4">${activity.establishment}</td>
+                    <td class="py-3 px-4">${new Date(activity.date).toLocaleString()}</td>
+                </tr>
+            `).join('');
+        }
+
+        // Chart Rendering Functions
+        function renderAppointmentsChart(data) {
+            const ctx = document.getElementById('appointmentsChart').getContext('2d');
+            
+            if (window.appointmentsChart) {
+                window.appointmentsChart.destroy();
+            }
+
+            window.appointmentsChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: data.labels,
+                    datasets: [{
+                        data: data.values,
+                        backgroundColor: [
+                            '#3B82F6', // blue
+                            '#10B981', // green
+                            '#EF4444', // red
+                            '#F59E0B'  // yellow
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+        }
+
+        function renderEstablishmentChart(data) {
+            const ctx = document.getElementById('establishmentChart').getContext('2d');
+            
+            if (window.establishmentChart) {
+                window.establishmentChart.destroy();
+            }
+
+            window.establishmentChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: data.labels,
+                    datasets: [{
+                        label: 'Rendez-vous',
+                        data: data.values,
+                        backgroundColor: '#F59E0B',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        }
+
+        // Event Listeners
+        document.getElementById('timePeriod').addEventListener('change', (e) => {
+            fetchStatistics(e.target.value);
+        });
+
+        // Initialize Dashboard
+        document.addEventListener('DOMContentLoaded', () => {
+            fetchStatistics();
+        });
     </script>
 </body>
-
 </html>

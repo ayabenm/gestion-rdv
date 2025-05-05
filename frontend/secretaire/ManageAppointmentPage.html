@@ -8,10 +8,12 @@
   <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.10.1/main.min.js"></script>
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet" />
-
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <!-- Add Luxon for better date handling -->
+  <script src="https://cdn.jsdelivr.net/npm/luxon@3.0.1/build/global/luxon.min.js"></script>
 
   <style>
-    /* Modal */
+    /* Your existing styles remain exactly the same */
     .modal {
       background-color: rgba(0, 0, 0, 0.6);
       position: fixed;
@@ -29,7 +31,6 @@
       opacity: 1;
     }
 
-    /* Animations for Modal */
     .modal-content {
       animation: slideFade 0.3s ease-out;
     }
@@ -39,7 +40,6 @@
         opacity: 0;
         transform: translateY(-20px);
       }
-
       to {
         opacity: 1;
         transform: translateY(0);
@@ -62,7 +62,6 @@
       box-shadow: 0 4px 20px rgba(99, 102, 241, 0.3);
     }
 
-    /* Sidebar transition */
     #sidebar {
       transition: all 0.3s ease;
       position: fixed;
@@ -73,15 +72,15 @@
     #mainContent {
       transition: margin-left 0.3s ease;
       margin-left: 4rem;
-      /* espace initial de 4rem pour le sidebar */
       width: 100%;
     }
   </style>
 </head>
 
 <body class="bg-gradient-to-br from-indigo-50 to-white min-h-screen flex">
-  <div id="sidebar"
-    class="bg-gradient-to-r from-gray-900 to-gray-800 text-white h-screen w-20 transition-all duration-300 flex flex-col shadow-lg">
+  <!-- Your existing sidebar remains exactly the same -->
+  <div id="sidebar" class="bg-gradient-to-r from-gray-900 to-gray-800 text-white h-screen w-20 transition-all duration-300 flex flex-col shadow-lg">
+    <!-- ... sidebar content ... -->
     <div class="flex items-center justify-center p-6 border-b border-gray-600 flex-shrink-0">
       <li onclick="toggleSidebar()"
         class="px-6 py-4 flex items-center justify-center gap-4 hover:bg-orange-600 cursor-pointer transition duration-200 rounded-lg">
@@ -99,19 +98,19 @@
       <li
         class="px-6 py-4 flex items-center gap-4 hover:bg-orange-600 hover:shadow-md transition duration-200 rounded-lg">
         <i class="fas fa-users w-6 text-center"></i>
-        <span class="sidebar-text hidden"><a href="etablissement.html"
-            class="block hover:text-gray-300">Établissements</a></span>
+        <span class="sidebar-text hidden"><a href="profile.html"
+            class="block hover:text-gray-300">Profile</a></span>
       </li>
       <li
         class="px-6 py-4 flex items-center gap-4 hover:bg-orange-600 hover:shadow-md transition duration-200 rounded-lg">
         <i class="fas fa-school w-6 text-center"></i>
-        <span class="sidebar-text hidden"><a href="departement.html"
-            class="block hover:text-gray-300">Département</a></span>
+        <span class="sidebar-text hidden"><a href="ListRequestsPage.html"
+            class="block hover:text-gray-300">Liste des Demandes</a></span>
       </li>
       <li
         class="px-6 py-4 flex items-center gap-4 hover:bg-orange-600 hover:shadow-md transition duration-200 rounded-lg">
         <i class="fas fa-building w-6 text-center"></i>
-        <span class="sidebar-text hidden"><a href="service.html" class="block hover:text-gray-300">Services</a></span>
+        <span class="sidebar-text hidden"><a href="ManageAppointmentPage.html" class="block hover:text-gray-300">📅 Attribution de Rendez-vous</a></span>
       </li>
       <li
         class="px-6 py-4 flex items-center gap-4 hover:bg-orange-600 hover:shadow-md transition duration-200 rounded-lg">
@@ -134,193 +133,248 @@
   <div id="mainContent" class="flex-1 bg-white p-6">
     <header class="bg-orange-500 text-white py-5 px-6 flex justify-between items-center shadow-lg">
       <h1 class="text-2xl font-bold">Tableau de bord</h1>
-      
     </header>
 
-  <div class="max-w-6xl mx-auto bg-white p-8 rounded-3xl shadow-xl">
-    <h2 class="text-3xl font-semibold text-center text-gray-800 mb-6">📅 Attribution de Rendez-vous</h2>
+    <div class="max-w-6xl mx-auto bg-white p-8 rounded-3xl shadow-xl">
+      <h2 class="text-3xl font-semibold text-center text-gray-800 mb-6">📅 Attribution de Rendez-vous</h2>
 
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-      <!-- Calendrier -->
-      <div class="bg-gradient-to-r from-blue-100 via-green-100 to-blue-50 rounded-xl shadow-lg p-4">
-        <div id="calendar" class="rounded-xl bg-white"></div>
-      </div>
-
-      <!-- Détails de la demande -->
-      <div class="bg-gray-50 p-6 rounded-3xl shadow-xl">
-        <h3 class="text-2xl font-semibold mb-4 text-gray-700">📄 Détails du Citoyen</h3>
-        <ul class="space-y-3 text-gray-800">
-          <li><strong>👤 Nom :</strong> <span id="citoyen" class="text-lg">Ali Ben Ahmed</span></li>
-          <li><strong>🏢 Département :</strong> <span id="departement" class="text-lg">Ministère des Affaires Etrangères</span></li>
-          <li><strong>🛠️ Service :</strong> <span id="service" class="text-lg">Service des Consulats</span></li>
-          <li><strong>📆 Date Demandée :</strong> <span id="date_demande" class="text-lg">2025-05-02</span></li>
-          <li><strong>⭐ Date Préférée :</strong> <span id="date_preferee" class="text-lg">	2025-05-05</span></li>
-          <li><strong>⏰ Deadline :</strong> <span id="date_deadline" class="text-lg">2025-05-07</span></li>
-        </ul>
-
-        <!-- Créneau choisi -->
-        <div class="mt-6">
-          <strong>🕒 Créneau sélectionné :</strong>
-          <div id="selection" class="text-xl text-green-600 font-semibold mt-1">Aucun</div>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <!-- Calendrier - Same styling -->
+        <div class="bg-gradient-to-r from-blue-100 via-green-100 to-blue-50 rounded-xl shadow-lg p-4">
+          <div id="calendar" class="rounded-xl bg-white"></div>
         </div>
 
-        <!-- Actions -->
-        <div class="flex gap-5 mt-8 justify-between">
-          <button id="btnConfirmer"
-                  class="hidden bg-green-600 text-white px-6 py-3 rounded-full hover:bg-green-700 transition duration-300 w-1/3">
-            ✅ Confirmer
-          </button>
+        <!-- Détails de la demande -->
+        <div class="bg-gray-50 p-6 rounded-3xl shadow-xl">
+          <h3 class="text-2xl font-semibold mb-4 text-gray-700">📄 Détails du Citoyen</h3>
+          <ul class="space-y-3 text-gray-800" id="appointmentDetails">
+            <!-- Will be populated by JavaScript -->
+          </ul>
 
-          <button id="btnRejeter"
-                  class="hidden bg-red-500 text-white px-6 py-3 rounded-full hover:bg-red-600 transition duration-300 w-1/3">
-            ❌ Rejeter
-          </button>
+          <!-- Créneau choisi -->
+          <div class="mt-6">
+            <strong>🕒 Créneau sélectionné :</strong>
+            <div id="selection" class="text-xl text-green-600 font-semibold mt-1">Aucun</div>
+          </div>
 
-          <button id="btnReporter"
-                  class="hidden bg-yellow-500 text-white px-6 py-3 rounded-full hover:bg-yellow-600 transition duration-300 w-1/3">
-            ⏳ Reporter
-          </button>
+          <!-- Actions -->
+          <div class="flex gap-5 mt-8 justify-between">
+            <button id="btnConfirmer" class="hidden bg-green-600 text-white px-6 py-3 rounded-full hover:bg-green-700 transition duration-300 w-1/3">
+              ✅ Confirmer
+            </button>
+            <button id="btnRejeter" class="hidden bg-red-500 text-white px-6 py-3 rounded-full hover:bg-red-600 transition duration-300 w-1/3">
+              ❌ Rejeter
+            </button>
+            <button id="btnReporter" class="hidden bg-yellow-500 text-white px-6 py-3 rounded-full hover:bg-yellow-600 transition duration-300 w-1/3">
+              ⏳ Reporter
+            </button>
+          </div>
         </div>
       </div>
     </div>
   </div>
-
-  <script>
-    let selectedSlot = null;
-
-    // Créneaux réservés (exemple)
- // Créneaux réservés (exemple corrigé)
- const reservedSlots = [
-      {
-        title: 'Réservé',
-        start: '2025-05-03T09:00:00',  // Correction de la date et de l'heure
-        end: '2025-05-03T10:00:00',    // Correction de la date et de l'heure
-        backgroundColor: '#FFDDDD',     // Rouge clair pour réservé
-        borderColor: '#FF0000',
-        display: 'block'
-      },
-      {
-        title: 'Réservé',
-        start: '2025-05-04T11:00:00',
-        end: '2025-05-04T12:00:00',
-        backgroundColor: '#FFDDDD',     // Rouge clair pour réservé
-        borderColor: '#FF0000',
-        display: 'block'
-      }
-    ];
-
-    // Fonction pour générer des créneaux horaires entre deux dates
-    function generateAvailableSlots(startDate, endDate, slotDuration) {
-      let slots = [];
-      let currentTime = new Date(startDate);
-
-      while (currentTime <= endDate) {
-        let slotEnd = new Date(currentTime);
-        slotEnd.setMinutes(currentTime.getMinutes() + slotDuration); // Durée du créneau
-
-        if (slotEnd <= endDate) {
-          slots.push({
-            title: 'Disponible',
-            start: currentTime.toISOString(),
-            end: slotEnd.toISOString(),
-            backgroundColor: '#D1FAE5',
-            borderColor: '#10B981',
-            display: 'block'
-          });
-        }
-
-        // Avance à la prochaine heure
-        currentTime.setMinutes(currentTime.getMinutes() + slotDuration);
-      }
-
-      return slots;
-    }
-
-    // Date Demandée et Deadline
-    const dateDemandee = new Date('2025-05-01');
-    const dateDeadline = new Date('2025-05-10');
-
-    // Génération des créneaux horaires entre les deux dates
-    const disponibilites = generateAvailableSlots(dateDemandee, dateDeadline, 60); // créneaux de 1h
-
-    // Fusionner les créneaux disponibles et réservés
-    const allSlots = [...disponibilites, ...reservedSlots];
-
-    const calendar = new FullCalendar.Calendar(document.getElementById('calendar'), {
-      initialView: 'timeGridWeek', // Vue initiale de la semaine
-      height: 600,
-      slotMinTime: '08:00:00',
-      slotMaxTime: '17:00:00',
-      locale: 'fr',
-      headerToolbar: {
-        left: 'prev,next today',  // Navigation
-        center: 'title',         // Titre
-        right: 'timeGridDay,timeGridWeek'  // Ajout des boutons pour changer la vue
-      },
-      events: allSlots,
-
-      eventClick: function(info) {
-        selectedSlot = info.event;
-        document.getElementById('selection').textContent = new Date(info.event.start).toLocaleString('fr-FR');
-
-        // Affiche les boutons
-        document.getElementById('btnConfirmer').classList.remove('hidden');
-        document.getElementById('btnRejeter').classList.remove('hidden');
-        document.getElementById('btnReporter').classList.remove('hidden');
-      }
-    });
-
-    calendar.render();
-
-    function confirmerAttribution() {
-      if (selectedSlot) {
-        alert(`✅ Rendez-vous confirmé pour le ${new Date(selectedSlot.start).toLocaleString('fr-FR')}`);
-        // Enregistrement via API ici si besoin
-      }
-    }
-
-    function rejeterDemande() {
-      alert('❌ Demande rejetée.');
-      // Traitement de rejet ici
-    }
-
-    function reporterDemande() {
-      alert('⏳ Demande marquée pour report. Veuillez choisir un nouveau créneau.');
-      // Tu peux ici proposer une nouvelle sélection via calendrier
-    }
-  </script>
-  
-  <script>
-    // Vérification du token JWT
-    const token = localStorage.getItem('token');
+  <div class="bg-gradient-to-r from-blue-100 via-green-100 to-blue-50 rounded-xl shadow-lg p-4">
+    <div id="calendar" class="rounded-xl bg-white"></div>
+  </div>
+ 
+  <!-- Replace your entire script section with: -->
+<script>
+   // Vérification du token JWT
+   const token = localStorage.getItem('token');
     const loginURL = '/rdv/frontend/login.html';
     if (!token) {
-      window.location.href = loginURL;  // Rediriger vers la page de connexion
+      window.location.href = loginURL;
     }
 
-    // Fonction de déconnexion
     function logout() {
       localStorage.removeItem('token');
       window.location.href = loginURL;
     }
-    // Fonction pour basculer l'état du sidebar
-    function toggleSidebar() {
-      const sidebar = document.getElementById("sidebar");
-      const textElements = sidebar.querySelectorAll(".sidebar-text");
-      const mainContent = document.getElementById("mainContent");
+  const { DateTime } = luxon;
+  let selectedSlot = null;
+  let currentAppointment = null;
 
-      if (sidebar.classList.contains("w-20")) {
-        sidebar.classList.remove("w-20");
-        sidebar.classList.add("w-64");
-        textElements.forEach(el => el.classList.remove("hidden"));
-        mainContent.style.marginLeft = "16rem"; /* augmenté à 16rem lorsque sidebar est ouvert */
-      } else {
-        sidebar.classList.remove("w-64");
-        sidebar.classList.add("w-20");
-        textElements.forEach(el => el.classList.add("hidden"));
-        mainContent.style.marginLeft = "4rem"; /* espace initial de 4rem */
-      }
+  // Créneaux réservés (exemple)
+  const reservedSlots = [
+    {
+      title: 'Réservé',
+      start: '2025-05-03T09:00:00',
+      end: '2025-05-03T10:00:00',
+      backgroundColor: '#FFDDDD',
+      borderColor: '#FF0000',
+      display: 'block'
+    },
+    {
+      title: 'Réservé',
+      start: '2025-05-04T11:00:00',
+      end: '2025-05-04T12:00:00',
+      backgroundColor: '#FFDDDD',
+      borderColor: '#FF0000',
+      display: 'block'
     }
-  </script>
+  ];
+
+  document.addEventListener('DOMContentLoaded', async function() {
+    // Get appointment data from localStorage
+    currentAppointment = JSON.parse(localStorage.getItem('demandeAttribuee'));
+    
+    if (!currentAppointment) {
+      alert('Aucune demande sélectionnée');
+      window.location.href = 'ListRequestsPage.html';
+      return;
+    }
+
+    // Display appointment details
+    displayAppointmentDetails(currentAppointment);
+
+    // Initialize calendar
+    initCalendar(currentAppointment);
+  });
+
+  function displayAppointmentDetails(appointment) {
+    const detailsContainer = document.getElementById('appointmentDetails');
+    detailsContainer.innerHTML = `
+      <li><strong>👤 Nom :</strong> <span class="text-lg">${appointment.citizen_name}</span></li>
+      <li><strong>🏢 Département :</strong> <span class="text-lg">${appointment.department}</span></li>
+      <li><strong>🛠️ Service :</strong> <span class="text-lg">${appointment.service}</span></li>
+      <li><strong>📆 Date Demandée :</strong> <span class="text-lg">${formatDate(appointment.date)}</span></li>
+      <li><strong>⭐ Date Préférée :</strong> <span class="text-lg">${formatDate(appointment.preferred_date)}</span></li>
+      <li><strong>⏰ Deadline :</strong> <span class="text-lg">${formatDate(appointment.deadline)}</span></li>
+    `;
+  }
+
+  function initCalendar(appointment) {
+    const calendarEl = document.getElementById('calendar');
+    
+    // Generate available slots between preferred date and deadline
+    const startDate = appointment.preferred_date || appointment.date;
+    const endDate = appointment.deadline;
+    const availableSlots = generateAvailableSlots(new Date(startDate), new Date(endDate), 60);
+
+    const calendar = new FullCalendar.Calendar(calendarEl, {
+      initialView: 'timeGridWeek',
+      height: 600,
+      slotMinTime: '08:00:00',
+      slotMaxTime: '17:00:00',
+      locale: 'fr',
+      selectable: true,
+      selectMirror: true,
+      headerToolbar: {
+        left: 'prev,next today',
+        center: 'title',
+        right: 'timeGridDay,timeGridWeek'
+      },
+      events: [...availableSlots, ...reservedSlots],
+      select: function(info) {
+        selectedSlot = {
+          start: info.start,
+          end: info.end
+        };
+        
+        updateSelectionDisplay(info.start, info.end);
+        showActionButtons();
+      },
+      eventClick: function(info) {
+        if (info.event.extendedProps.type === 'available') {
+          selectedSlot = info.event;
+          updateSelectionDisplay(info.event.start, info.event.end);
+          showActionButtons();
+        }
+      }
+    });
+
+    calendar.render();
+  }
+
+  function generateAvailableSlots(startDate, endDate, slotDuration) {
+    const slots = [];
+    const current = new Date(startDate);
+    
+    while (current <= endDate) {
+      // Only weekdays (Mon-Fri)
+      if (current.getDay() >= 1 && current.getDay() <= 5) {
+        for (let hour = 8; hour < 17; hour++) {
+          const slotStart = new Date(current);
+          slotStart.setHours(hour, 0, 0, 0);
+          
+          const slotEnd = new Date(slotStart);
+          slotEnd.setMinutes(slotStart.getMinutes() + slotDuration);
+          
+          // Skip if slot is in the past
+          if (slotStart > new Date()) {
+            slots.push({
+              title: 'Disponible',
+              start: slotStart,
+              end: slotEnd,
+              backgroundColor: '#D1FAE5',
+              borderColor: '#10B981',
+              display: 'block',
+              extendedProps: { type: 'available' }
+            });
+          }
+        }
+      }
+      current.setDate(current.getDate() + 1);
+    }
+    return slots;
+  }
+
+  function updateSelectionDisplay(start, end) {
+    document.getElementById('selection').textContent = 
+      `${formatDate(start)} à ${formatTime(start)} - ${formatTime(end)}`;
+  }
+
+  function showActionButtons() {
+    document.getElementById('btnConfirmer').classList.remove('hidden');
+    document.getElementById('btnRejeter').classList.remove('hidden');
+    document.getElementById('btnReporter').classList.remove('hidden');
+  }
+
+  function formatDate(date) {
+    return DateTime.fromJSDate(date).setLocale('fr').toLocaleString(DateTime.DATE_FULL);
+  }
+
+  function formatTime(date) {
+    return DateTime.fromJSDate(date).setLocale('fr').toLocaleString(DateTime.TIME_SIMPLE);
+  }
+
+  // Setup button actions
+  document.getElementById('btnConfirmer').addEventListener('click', () => handleAction('confirm'));
+  document.getElementById('btnRejeter').addEventListener('click', () => handleAction('reject'));
+  document.getElementById('btnReporter').addEventListener('click', () => handleAction('reschedule'));
+
+  async function handleAction(action) {
+    if (!selectedSlot && action !== 'reject') {
+      alert('Veuillez sélectionner un créneau');
+      return;
+    }
+
+    try {
+      const response = await fetch(`http://localhost:3000/api/appointments/${currentAppointment.id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': localStorage.getItem('token')
+        },
+        body: JSON.stringify({
+          action: action,
+          date_rdv: action !== 'reject' ? selectedSlot.start.toISOString() : null,
+          statut: action === 'confirm' ? 'validé' : action === 'reject' ? 'rejeté' : 'reporté'
+        })
+      });
+
+      if (!response.ok) throw new Error('Échec de la requête');
+
+      const result = await response.json();
+      alert(`Rendez-vous ${action === 'confirm' ? 'confirmé' : action === 'reject' ? 'rejeté' : 'reporté'}`);
+      window.location.href = 'ListRequestsPage.html';
+    } catch (error) {
+      console.error('Error:', error);
+      alert('Une erreur est survenue');
+    }
+  }
+
+  // ... keep your existing sidebar and logout functions ...
+</script>
 </body>
 </html>

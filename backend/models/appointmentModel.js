@@ -20,7 +20,33 @@ getAppointmentsByCitizen : (citoyenId, callback) => {
 editAppointmentStatut : (id, statut, callback) => {
   const sql = 'UPDATE appointments SET statut = ? WHERE id = ?';
   db.query(sql, [statut, id], callback);
+},
+
+// In appointmentModel.js
+getAppointmentsByEstablishment: (establishmentId, callback) => {
+  const sql = `
+      SELECT 
+          a.id, 
+          a.date_rdv AS date,
+          a.preferred_date,
+          a.deadline,
+          a.statut,
+          e.name AS establishment,
+          d.name AS department,
+          s.name AS service,
+          s.priority AS service_priority,
+          u.nom AS citizen_name
+      FROM appointments a
+      JOIN establishments e ON a.establishment_id = e.id
+      JOIN departements d ON a.departement_id = d.id
+      JOIN services s ON a.service_id = s.id
+      JOIN users u ON a.citoyen_id = u.id
+      WHERE a.establishment_id = ?
+      ORDER ORDER BY a.date_rdv ASC, a.deadline ASC
+  `;
+  db.query(sql, [establishmentId], callback);
+},
 }
-}
+
 
 module.exports = Appointment;

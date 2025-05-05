@@ -1,20 +1,54 @@
 const express = require('express');
 const router = express.Router();
 const Appointment = require('../models/appointmentModel');
+const db = require('../config/db'); // Add this line to import the db connection
 
-// Route pour récupérer les rendez-vous d'un citoyen
+// Route pour récupérer les rendez-vous
 router.get('/', async (req, res) => {
-    const { id } = req.user;
-    Appointment.getAppointmentsByCitizen(id, (err, appointments) => {
-      if(err) {
-        res.status(500).json({ message: 'Erreur lors de la récupération des rendez-vous', error: err });
-      } else {
-        res.status(200).json(appointments);
-
-      } 
-    })
-  });
+  const { id, role, establishment_id } = req.user;
   
+  if (role === 'secretaire') {
+      // For secretaries, get appointments for their establishment
+      const sql = `
+          SELECT 
+              a.id, 
+              a.date_rdv AS date,
+              a.preferred_date,
+              a.deadline,
+              a.statut,
+              e.name AS establishment,
+              d.name AS department,
+              s.name AS service,
+              s.priority AS service_priority,
+              CONCAT(u.firstname, ' ', u.lastname) AS citizen_name
+          FROM appointments a
+          JOIN establishments e ON a.establishment_id = e.id
+          JOIN departements d ON a.departement_id = d.id
+          JOIN services s ON a.service_id = s.id
+          JOIN users u ON a.citoyen_id = u.id
+          WHERE a.establishment_id = ?
+          ORDER BY a.date_rdv ASC, a.deadline ASC
+      `;
+      
+      db.query(sql, [establishment_id], (err, appointments) => {
+          if(err) {
+              res.status(500).json({ message: 'Erreur lors de la récupération des rendez-vous', error: err });
+          } else {
+              res.status(200).json(appointments);
+          }
+      });
+  } else {
+      // Original citizen query remains the same
+      Appointment.getAppointmentsByCitizen(id, (err, appointments) => {
+          if(err) {
+              res.status(500).json({ message: 'Erreur lors de la récupération des rendez-vous', error: err });
+          } else {
+              res.status(200).json(appointments);
+          } 
+      });
+  }
+});
+
 
 // Enregistrement d'un rendez-vous
 router.post('/', async (req, res) => {

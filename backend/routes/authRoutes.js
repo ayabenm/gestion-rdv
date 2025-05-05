@@ -130,6 +130,16 @@ router.post('/login', (req, res) => {
 // Route de mot de passe oublié
 router.post('/forgot-password', (req, res) => {
   const { email } = req.body;
+  const transporter = nodemailer.createTransport({
+    service:"gmail",
+      host:"smtp.gmail.com",
+      port:465,
+      secure:false,
+      auth:{
+          user:"barca0483@gmail.com",
+          pass:"voyn csdk cgns izbz",
+      }
+  });
 
   authModel.getUserByEmail(email, async (err, results) => {
     if (err) return res.status(500).json({ message: 'Erreur serveur.' });
@@ -145,10 +155,10 @@ router.post('/forgot-password', (req, res) => {
       { expiresIn: '1h' }
     );
 
-    const resetUrl = `http://localhost/rdv/frontend/reset-password.html?token=${resetToken}`;
+    const resetUrl = `http://localhost/g-_rdv-main/frontend/reset-password.html?token=${resetToken}`;
 
     const mailOptions = {
-      from: 'eyabenmessaoud123@gmail.com',
+      from: "barca0483@gmail.com",
       to: email,
       subject: 'Réinitialisation du mot de passe',
       text: `Bonjour,\n\nPour réinitialiser votre mot de passe, cliquez sur le lien suivant : ${resetUrl}\n\nCe lien expire dans 1 heure.`
@@ -165,7 +175,6 @@ router.post('/forgot-password', (req, res) => {
     });
   });
 });
-
 // Route de réinitialisation du mot de passe
 router.post('/reset-password', async (req, res) => {
   const { token, newPassword } = req.body;

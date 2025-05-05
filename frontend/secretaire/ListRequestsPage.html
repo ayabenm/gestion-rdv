@@ -8,6 +8,7 @@
   <link href="https://cdn.jsdelivr.net/npm/fullcalendar@5.10.1/main.min.css" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/lib/index.js"></script>
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
   
   <script src="https://cdn.tailwindcss.com"></script>
 
@@ -138,19 +139,19 @@
       <li
         class="px-6 py-4 flex items-center gap-4 hover:bg-orange-600 hover:shadow-md transition duration-200 rounded-lg">
         <i class="fas fa-users w-6 text-center"></i>
-        <span class="sidebar-text hidden"><a href="etablissement.html"
-            class="block hover:text-gray-300">Établissements</a></span>
+        <span class="sidebar-text hidden"><a href="profile.html"
+            class="block hover:text-gray-300">Profile</a></span>
       </li>
       <li
         class="px-6 py-4 flex items-center gap-4 hover:bg-orange-600 hover:shadow-md transition duration-200 rounded-lg">
         <i class="fas fa-school w-6 text-center"></i>
-        <span class="sidebar-text hidden"><a href="departement.html"
-            class="block hover:text-gray-300">Département</a></span>
+        <span class="sidebar-text hidden"><a href="ListRequestsPage.html"
+            class="block hover:text-gray-300">Liste des Demandes</a></span>
       </li>
       <li
         class="px-6 py-4 flex items-center gap-4 hover:bg-orange-600 hover:shadow-md transition duration-200 rounded-lg">
         <i class="fas fa-building w-6 text-center"></i>
-        <span class="sidebar-text hidden"><a href="service.html" class="block hover:text-gray-300">Services</a></span>
+        <span class="sidebar-text hidden"><a href="ManageAppointmentPage.html" class="block hover:text-gray-300">📅 Attribution de Rendez-vous</a></span>
       </li>
       <li
         class="px-6 py-4 flex items-center gap-4 hover:bg-orange-600 hover:shadow-md transition duration-200 rounded-lg">
@@ -166,8 +167,7 @@
         <i class="fas fa-sign-out-alt"></i>
         <span class="sidebar-text hidden">Déconnexion</span>
       </button>
-    </div>
-  </div>
+    </div>  </div>
 
   <!-- Main Content -->
   <div id="mainContent" class="flex-1 bg-white p-6">
@@ -201,48 +201,92 @@
   </div>
 
   <script>
-    // Simulation des demandes de rendez-vous
-    const demandes = [
-      { id: 1, nom: "Ali Ben Ahmed", departement: "Ministère des Affaires Etrangères", service: "Service des Consulats", date_demande: "2025-05-02", date_preferer: "2025-05-05", deadline: "2025-05-07" },
-      { id: 2, nom: "Sara Khalil", departement: "Ministère de l'Intérieur", service: "Service des Visas", date_demande: "2025-04-30", date_preferer: "2025-05-01", deadline: "2025-05-03" },
-      { id: 3, nom: "Nadia Hamdi", departement: "Ministère des Finances", service: "Service des Impôts", date_demande: "2025-05-03", date_preferer: "2025-05-04", deadline: "2025-05-06"},
-    ];
+   token = localStorage.getItem('token');
+  const apiUrl = "http://localhost:3000/api";
+// Fetch sorted requests from backend
+async function fetchSortedRequests() {
+  try {
+    const response = await fetch(`${apiUrl}/appointments`,{
+      headers: {
+        "Content-Type": "application/json",
+         "Authorization": token
+      }
+    });
+    
+    if (!response.ok) throw new Error('Failed to fetch requests');
+    
+    return await response.json();
+  } catch (error) {
+    console.error('Error:', error);
+    return [];
+  }
+}
 
-    // Fonction pour afficher les demandes triées par priorité
-    function afficherDemandes() {
-      const tableBody = document.getElementById('demandeList');
-      tableBody.innerHTML = '';
 
-      demandes.forEach(demande => {
-        const row = document.createElement('tr');
-        row.classList.add('border-b', 'hover:bg-orange-50');
-        row.innerHTML = `
-          <td class="py-4 px-6">${demande.nom}</td>
-          <td class="py-4 px-6">${demande.departement}</td>
-          <td class="py-4 px-6">${demande.service}</td>
-          <td class="py-4 px-6">${demande.date_demande}</td>
-          <td class="py-4 px-6">${demande.date_preferer}</td>
-          <td class="py-4 px-6">${demande.deadline}</td>
-          <td class="py-4 px-6">
-            <button onclick="attribuerRendezVous(${demande.id})" class="btn-assign">Attribuer</button>
-          </td>
-        `;
-        tableBody.appendChild(row);
-      });
+// Declare demandes at a higher scope
+let demandes = [];
+
+async function afficherDemandes() {
+  const tableBody = document.getElementById('demandeList');
+  tableBody.innerHTML = '<tr><td colspan="7" class="text-center py-4">Chargement...</td></tr>';
+
+  // Assign to the higher-scoped variable
+  demandes = await fetchSortedRequests();
+  
+  if (demandes.length === 0) {
+    tableBody.innerHTML = '<tr><td colspan="7" class="text-center py-4">Aucune demande trouvée</td></tr>';
+    return;
+  }
+
+  tableBody.innerHTML = '';
+  
+  demandes.forEach(demande => {
+    const row = document.createElement('tr');
+    row.classList.add('border-b', 'hover:bg-orange-50');
+    row.innerHTML = `
+      <td class="py-4 px-6">${demande.citizen_name}</td>  <!-- Changed from demande.nom -->
+      <td class="py-4 px-6">${demande.department}</td>    <!-- Changed from demande.departement -->
+      <td class="py-4 px-6">${demande.service}</td>
+      <td class="py-4 px-6">${new Date(demande.date).toLocaleDateString('fr-FR')}</td>  <!-- Changed from demande.date_demande -->
+      <td class="py-4 px-6">${new Date(demande.preferred_date).toLocaleDateString('fr-FR')}</td>  <!-- Changed from demande.date_preferer -->
+      <td class="py-4 px-6">${new Date(demande.deadline).toLocaleDateString('fr-FR')}</td>
+      <td class="py-4 px-6">
+        <button onclick="attribuerRendezVous(${demande.id})" class="btn-assign">Attribuer</button>
+      </td>
+    `;
+    tableBody.appendChild(row);
+  });
+}
+function attribuerRendezVous(demandeId) {
+    // Find the appointment in the demandes array
+    const demande = demandes.find(d => d.id == demandeId);
+    
+    if (!demande) {
+      alert('Demande non trouvée');
+      return;
     }
-
-    // Fonction pour attribuer un rendez-vous et rediriger vers le calendrier
-    function attribuerRendezVous(demandeId) {
-      const demande = demandes.find(d => d.id === demandeId);
-      localStorage.setItem('demandeAttribuee', JSON.stringify(demande));
-      window.location.href = "ManageAppointmentPage.html";  // Redirige vers le calendrier
-    }
-
-    // Appel pour afficher les demandes triées au chargement de la page
+    
+    // Prepare the data to transfer
+    const appointmentData = {
+      id: demande.id,
+      citizen_name: demande.citizen_name,
+      department: demande.department,
+      service: demande.service,
+      date: demande.date,
+      preferred_date: demande.preferred_date,
+      deadline: demande.deadline,
+      service_id: demande.service_id || 1 // Default to 1 if not provided
+    };
+    
+    localStorage.setItem('demandeAttribuee', JSON.stringify(appointmentData));
+    window.location.href = "ManageAppointmentPage.html";
+  }
+ // Appel pour afficher les demandes triées au chargement de la page
     afficherDemandes();
   </script>
   
   <script>
+    
     // Vérification du token JWT
     const token = localStorage.getItem('token');
     const loginURL = '/rdv/frontend/login.html';
