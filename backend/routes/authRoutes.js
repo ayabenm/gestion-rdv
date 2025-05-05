@@ -4,7 +4,7 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const nodemailer = require('nodemailer');
 const authModel = require('../models/authModel');
-
+const SECRET_KEY = 'SECRET_KEY';
 // SUPPRIMÉ : require('dotenv').config();
 
 // Looking to send emails in production? Check out our Email API/SMTP product!
@@ -127,79 +127,66 @@ router.post('/login', (req, res) => {
   });
 });
 
-// Route de mot de passe oublié
+// Forgot password route
 router.post('/forgot-password', (req, res) => {
   const { email } = req.body;
+
   const transporter = nodemailer.createTransport({
-    service:"gmail",
-      host:"smtp.gmail.com",
-      port:465,
-      secure:false,
-      auth:{
-          user:"barca0483@gmail.com",
-          pass:"voyn csdk cgns izbz",
-      }
+    service: "gmail",
+    auth: {
+      user: "barca0483@gmail.com",
+      pass: "voyn csdk cgns izbz"
+    }
   });
 
-  authModel.getUserByEmail(email, async (err, results) => {
+  authModel.getUserByEmail(email, (err, results) => {
     if (err) return res.status(500).json({ message: 'Erreur serveur.' });
-
-    if (results.length === 0) {
-      return res.status(404).json({ message: 'Utilisateur non trouvé.' });
-    }
+    if (results.length === 0) return res.status(404).json({ message: 'Utilisateur non trouvé.' });
 
     const user = results[0];
-    const resetToken = jwt.sign(
-      { id: user.id },
-      'SECRET_KEY',
-      { expiresIn: '1h' }
-    );
-
-    const resetUrl = `http://localhost/g-_rdv-main/frontend/reset-password.html?token=${resetToken}`;
+    const resetToken = jwt.sign({ id: user.id }, SECRET_KEY, { expiresIn: '1h' });
+    const resetUrl = `http://localhost/rdv/frontend/reset-password.html?token=${resetToken}`;
 
     const mailOptions = {
       from: "barca0483@gmail.com",
       to: email,
       subject: 'Réinitialisation du mot de passe',
-      text: `Bonjour,\n\nPour réinitialiser votre mot de passe, cliquez sur le lien suivant : ${resetUrl}\n\nCe lien expire dans 1 heure.`
+      text: `Cliquez sur ce lien pour réinitialiser votre mot de passe : ${resetUrl}`
     };
 
     transporter.sendMail(mailOptions, (error, info) => {
       if (error) {
-        console.log('Erreur lors de l\'envoi de l\'email:', error);
-        return res.status(500).json({ message: 'Erreur lors de l\'envoi de l\'email.' });
-      } else {
-        console.log('Email envoyé:', info.response);
-        res.status(200).json({ message: 'Email de réinitialisation envoyé.' });
+        console.error('Erreur envoi email:', error);
+        return res.status(500).json({ message: 'Erreur envoi email.' });
       }
+      res.status(200).json({ message: 'Email de réinitialisation envoyé.' });
     });
   });
 });
-// Route de réinitialisation du mot de passe
-router.post('/reset-password', async (req, res) => {
-  const { token, newPassword } = req.body;
 
+// Reset password route
+router.post('/reset-password', (req, res) => {
+  const { token, newPassword } = req.body;
   if (!token || !newPassword) {
     return res.status(400).json({ message: 'Token et nouveau mot de passe sont requis.' });
   }
 
   try {
-    const decoded = jwt.verify(token, 'SECRET_KEY');
+    const decoded = jwt.verify(token, SECRET_KEY);
     const userId = decoded.id;
 
     if (newPassword.length < 8) {
-      return res.status(400).json({ message: 'Le mot de passe doit contenir au moins 8 caractères.' });
+      return res.status(400).json({ message: 'Mot de passe trop court (min 8 caractères).' });
     }
 
     const hashedPassword = bcrypt.hashSync(newPassword, 10);
 
     authModel.updatePassword(userId, hashedPassword, (err, result) => {
-      if (err) {
-        return res.status(500).json({ message: 'Erreur serveur lors de la mise à jour du mot de passe.' });
-      }
+      if (err) return res.status(500).json({ message: 'Erreur mise à jour mot de passe.' });
       res.status(200).json({ message: 'Mot de passe réinitialisé avec succès.' });
     });
   } catch (err) {
+    console.error('Erreur token:', err);
     return res.status(400).json({ message: 'Token invalide ou expiré.' });
   }
 });
