@@ -28,6 +28,18 @@
       <h2 class="text-3xl font-bold text-center text-orange-600 mb-4">Bienvenue 👋</h2>
       <p class="text-center text-gray-600 mb-6">Connectez-vous à votre compte</p>
 
+      <!-- Sélecteur de rôle -->
+      <div class="mb-4">
+        <label for="role" class="block mb-1 text-sm text-gray-600">Sélectionnez votre rôle :</label>
+        <select id="role" name="role" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500">
+          <option value="">Sélectionnez votre rôle</option>
+          <option value="admin">Admin</option>
+          <option value="superadmin">Super Admin</option>
+          <option value="secretaire">Secrétaire</option>
+          <option value="citoyen">Citoyen</option>
+        </select>
+      </div>
+
       <form id="loginForm" class="space-y-5">
         <input required type="email" name="email" placeholder="Email"
           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500" />
@@ -49,7 +61,8 @@
         <span class="border-b w-1/5 lg:w-1/4"></span>
       </div>
 
-      <p class="mt-6 text-center text-sm text-gray-600">
+      <!-- Lien créer un compte, visible seulement pour citoyen -->
+      <p id="createAccountLink" class="mt-6 text-center text-sm text-gray-600">
         Pas encore de compte ? <a href="register.html" class="text-orange-500 hover:underline">Créer un compte</a>
       </p>
     </div>
@@ -57,13 +70,37 @@
 
   <script>
     const form = document.getElementById('loginForm');
+    const roleSelect = document.getElementById('role');
+    const createAccountLink = document.getElementById('createAccountLink');
+
+    // Mettre à jour l'affichage du lien "Créer un compte"
+    function updateCreateAccountVisibility() {
+      if (roleSelect.value === 'citoyen') {
+        createAccountLink.style.display = 'block';
+      } else {
+        createAccountLink.style.display = 'none';
+      }
+    }
+
+    // Initialiser l'affichage
+    updateCreateAccountVisibility();
+
+    // Écouter le changement de rôle
+    roleSelect.addEventListener('change', updateCreateAccountVisibility);
 
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
 
+      // Vérifier que le rôle est sélectionné
+      if (roleSelect.value === '') {
+        alert('Veuillez sélectionner un rôle.');
+        return;
+      }
+
       const data = {
         email: form.email.value,
-        password: form.password.value
+        password: form.password.value,
+        role: roleSelect.value  // important
       };
 
       try {

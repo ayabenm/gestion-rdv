@@ -93,10 +93,9 @@ router.post('/register', async (req, res) => {
     res.status(500).json({ message: 'Erreur serveur.' });
   }
 });
-
 // Route de connexion
 router.post('/login', (req, res) => {
-  const { email, password } = req.body;
+  const { email, password, role } = req.body;  // on récupère aussi le rôle envoyé depuis le frontend
   
   authModel.getUserByEmail(email, async (err, results) => {
     if (err) return res.status(500).json({ message: 'Erreur serveur.' });
@@ -110,6 +109,11 @@ router.post('/login', (req, res) => {
     
     if (!validPassword) {
       return res.status(401).json({ message: 'Mot de passe incorrect.' });
+    }
+
+    // Vérifier si le rôle correspond à celui en base
+    if (user.role !== role) {
+      return res.status(403).json({ message: 'Vous ne pouvez pas vous connecter avec ce rôle.' });
     }
 
     const token = jwt.sign(
